@@ -48,7 +48,7 @@ main()
 * Fortran 77 - Legacy Code Integration and Compiler Optimization
 * Assembly - Embedded Systems, Systems Programming
 * Machine Code - Manually adapting language for close-to-the-metal memory and hardware control.
-* Objective-C/C++ - For memory and hardware allocation capabalities
+* Objective-C/C++ - For memory and hardware allocation capabilities
 * C/C++20 - The main programming language used
 * LLVM (Version 18.1.5) - For constructing compiler
 * CMake - A software construction tool
