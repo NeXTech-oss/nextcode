@@ -2,39 +2,30 @@
 
 NeXTCode is an innovative programming language that combines the efficiency and speed of Go with the elegance and practicality of Python. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
 ```
-with Language;
+import Foundation
 
-package Geometry is
-   type Circle is record
-      Radius : Float := 0.0;
-      Pi : Float := 3.14;
-   end record;
+struct Circle {
+    var radius: Double
+    let pi: Double = 3.14
+}
 
-   package CircleHelpers is
-      procedure Print_Total_Area(Circles : in out Vector of Circle);
-   end CircleHelpers;
-end Geometry;
+function printTotalArea(circles: inout [Circle]) {
+    var totalArea: Double = 0.0
+    for circle in circles {
+        totalArea += circle.pi * pow(circle.radius, 2.0)
+    }
+    print("Total area: \(totalArea)")
+}
 
-package body Geometry.CircleHelpers is
-   procedure Print_Total_Area(Circles : in out Vector of Circle) is
-      Total_Area : Float := 0.0;
-   begin
-      for Circle_Item of Circles loop
-         Total_Area := Total_Area + 3.14 * Circle_Item.Radius**2.0;
-      end loop;
-      output("Total area: " & Float'Image(Total_Area));
-   end Print_Total_Area;
-end Geometry.CircleHelpers;
+function main() {
+    var circles: [Circle] = [
+        Circle(radius: 1.0),
+        Circle(radius: 2.0)
+    ]
+    printTotalArea(circles: &circles)
+}
 
-procedure Main is
-   Circles : Vector(1 .. 2) of Geometry.Circle := (
-      (Radius => 1.0, Pi => 3.14),
-      (Radius => 2.0, Pi => 3.14)
-   );
-begin
-   Geometry.CircleHelpers.Print_Total_Area(Circles);
-end Main;
-
+main()
 ```
 ## Killer Features of the Language
 
