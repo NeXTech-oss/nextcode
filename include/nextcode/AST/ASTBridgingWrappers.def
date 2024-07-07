@@ -1,0 +1,105 @@
+//===--- ASTBridgingWrappers.def - NeXTCode AST Metaprogramming ----*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines macros used for bridging macro-metaprogramming with AST
+// nodes.
+//
+//===----------------------------------------------------------------------===//
+
+/// AST_BRIDGING_WRAPPER(Name)
+///   The default macro to define a bridging wrapper type.
+
+/// AST_BRIDGING_WRAPPER_NULLABLE(Name)
+///   Specifies that both a nullable and non-null variant of the wrapper should
+///   be created.
+#ifndef AST_BRIDGING_WRAPPER_NULLABLE
+#define AST_BRIDGING_WRAPPER_NULLABLE(Name) AST_BRIDGING_WRAPPER(Name)
+#endif
+
+/// AST_BRIDGING_WRAPPER_NONNULL(Name)
+///   Specifies that only a non-null variant of the wrapper should be created.
+#ifndef AST_BRIDGING_WRAPPER_NONNULL
+#define AST_BRIDGING_WRAPPER_NONNULL(Name) AST_BRIDGING_WRAPPER(Name)
+#endif
+
+#ifndef DECL
+#define DECL(Id, Parent) AST_BRIDGING_WRAPPER_NULLABLE(Id##Decl)
+#endif
+#define ABSTRACT_DECL(Id, Parent) DECL(Id, Parent)
+#include "nextcode/AST/DeclNodes.def"
+
+#ifndef EXPR
+#define EXPR(Id, Parent) AST_BRIDGING_WRAPPER_NONNULL(Id##Expr)
+#endif
+#define ABSTRACT_EXPR(Id, Parent) EXPR(Id, Parent)
+#include "nextcode/AST/ExprNodes.def"
+
+#ifndef STMT
+#define STMT(Id, Parent) AST_BRIDGING_WRAPPER_NONNULL(Id##Stmt)
+#endif
+#define ABSTRACT_STMT(Id, Parent) STMT(Id, Parent)
+#include "nextcode/AST/StmtNodes.def"
+
+#ifndef TYPEREPR
+#define TYPEREPR(Id, Parent) AST_BRIDGING_WRAPPER_NONNULL(Id##TypeRepr)
+#endif
+#define ABSTRACT_TYPEREPR(Id, Parent) TYPEREPR(Id, Parent)
+#include "nextcode/AST/TypeReprNodes.def"
+
+#ifndef PATTERN
+#define PATTERN(Id, Parent) AST_BRIDGING_WRAPPER_NONNULL(Id##Pattern)
+#endif
+#include "nextcode/AST/PatternNodes.def"
+
+#ifndef DECL_ATTR
+#define SIMPLE_DECL_ATTR(...)
+#define DECL_ATTR(_, Id, ...) AST_BRIDGING_WRAPPER_NONNULL(Id##Attr)
+#endif
+#include "nextcode/AST/DeclAttr.def"
+
+// Some of the base classes need to be nullable to allow them to be used as
+// optional parameters.
+AST_BRIDGING_WRAPPER_NONNULL(Decl)
+AST_BRIDGING_WRAPPER_NONNULL(DeclContext)
+AST_BRIDGING_WRAPPER_NONNULL(SourceFile)
+AST_BRIDGING_WRAPPER_NULLABLE(Stmt)
+AST_BRIDGING_WRAPPER_NULLABLE(Expr)
+AST_BRIDGING_WRAPPER_NULLABLE(Pattern)
+AST_BRIDGING_WRAPPER_NULLABLE(TypeRepr)
+AST_BRIDGING_WRAPPER_NULLABLE(DeclAttribute)
+AST_BRIDGING_WRAPPER_NULLABLE(TypeAttribute)
+
+// Misc AST types to generate wrappers for.
+AST_BRIDGING_WRAPPER_NULLABLE(GenericParamList)
+AST_BRIDGING_WRAPPER_NULLABLE(TrailingWhereClause)
+AST_BRIDGING_WRAPPER_NULLABLE(ParameterList)
+AST_BRIDGING_WRAPPER_NULLABLE(PatternBindingInitializer)
+AST_BRIDGING_WRAPPER_NONNULL(TypeAttributes)
+AST_BRIDGING_WRAPPER_NONNULL(CustomAttribute)
+AST_BRIDGING_WRAPPER_NONNULL(ArgumentList)
+
+// Non-AST types to generate wrappers for.
+AST_BRIDGING_WRAPPER_NULLABLE(DiagnosticEngine)
+
+#undef AST_BRIDGING_WRAPPER_NONNULL
+#undef AST_BRIDGING_WRAPPER_NULLABLE
+#undef AST_BRIDGING_WRAPPER
