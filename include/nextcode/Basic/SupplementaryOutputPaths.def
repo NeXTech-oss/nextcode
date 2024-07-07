@@ -1,0 +1,177 @@
+//===--- SupplementaryOutputPaths.def - Output Names and Types --*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines all the Supplemtary Output Path variables and their
+// output types.
+//
+//===----------------------------------------------------------------------===//
+
+/// The path to which we should emit a header file that exposes the NeXTCode
+/// declarations to C, Objective-C and C++ clients for the module.
+///
+/// Currently only makes sense when the compiler has whole module knowledge.
+/// The modes for which it makes sense incuide both WMO and the "merge
+/// modules" job that happens after the normal compilation jobs. That's where
+/// the header is emitted in single-file mode, since it needs whole-module
+/// information.
+///
+/// \sa nextcode::printAsClangHeader
+OUTPUT(ClangHeaderOutputPath, TY_ClangHeader)
+
+/// The path to which we should emit a serialized module.
+/// It is valid whenever there are any inputs.
+///
+/// This binary format is used to describe the interface of a module when
+/// imported by client source code. The nextcodemodule format is described in
+/// docs/Serialization.md.
+///
+/// \sa nextcode::serialize
+OUTPUT(ModuleOutputPath, TY_NeXTCodeModuleFile)
+
+/// The path to which we should emit a module source information file.
+/// It is valid whenever there are any inputs.
+///
+/// This binary format stores source locations and other information about the
+/// declarations in a module.
+///
+/// \sa nextcode::serialize
+OUTPUT(ModuleSourceInfoOutputPath, TY_NeXTCodeSourceInfoFile)
+
+/// The path to which we should emit a module documentation file.
+/// It is valid whenever there are any inputs.
+///
+/// This binary format stores doc comments and other information about the
+/// declarations in a module.
+///
+/// \sa nextcode::serialize
+OUTPUT(ModuleDocOutputPath, TY_NeXTCodeModuleDocFile)
+
+/// The path to which we should output a Make-style dependencies file.
+/// It is valid whenever there are any inputs.
+///
+/// NeXTCode's compilation model means that Make-style dependencies aren't
+/// well-suited to model fine-grained dependencies. See docs/Driver.md for
+/// more information.
+///
+/// \sa ReferenceDependenciesFilePath
+OUTPUT(DependenciesFilePath, TY_Dependencies)
+
+/// The path to which we should output a NeXTCode "reference dependencies" file.
+/// It is valid whenever there are any inputs.
+///
+/// "Reference dependencies" track dependencies on a more fine-grained level
+/// than just "this file depends on that file". With NeXTCode's "implicit
+/// visibility" within a module, that becomes very important for any sort of
+/// incremental build. These files are consumed by the NeXTCode driver to decide
+/// whether a source file needs to be recompiled during a build. See
+/// docs/DependencyAnalysis.md for more information.
+///
+/// \sa nextcode::emitReferenceDependencies
+/// \sa DependencyGraph
+OUTPUT(ReferenceDependenciesFilePath, TY_NeXTCodeDeps)
+
+/// Path to a file which should contain serialized diagnostics for this
+/// frontend invocation.
+///
+/// This uses the same serialized diagnostics format as Clang, for tools that
+/// want machine-parseable diagnostics. There's a bit more information on
+/// how clients might use this in docs/Driver.md.
+///
+/// \sa nextcode::serialized_diagnostics::createConsumer
+OUTPUT(SerializedDiagnosticsPath, TY_SerializedDiagnostics)
+
+/// The path to which we should output fix-its as source edits.
+///
+/// This is a JSON-based format that is used by the migrator, but is not
+/// really vetted for anything else.
+///
+/// \sa nextcode::writeEditsInJson
+OUTPUT(FixItsOutputPath, TY_NeXTCodeFixIt)
+
+/// The path to which we should output a loaded module trace file.
+/// It is valid whenever there are any inputs.
+///
+/// The file is appended to, and consists of line-delimited JSON objects,
+/// where each line is of the form `{ "name": NAME, "target": TARGET,
+/// "nextcodemodules": [PATH, PATH, ...] }`, representing the (real-path) PATHs
+/// to each .codemodule that was loaded while building module NAME for target
+/// TARGET. This format is subject to arbitrary change, however.
+OUTPUT(LoadedModuleTracePath, TY_ModuleTrace)
+
+/// The path to which we should output a TBD file.
+///
+/// "TBD" stands for "text-based dylib". It's a YAML-based format that
+/// describes the public ABI of a library, which clients can link against
+/// without having an actual dynamic library binary.
+///
+/// Only makes sense when the compiler has whole-module knowledge.
+///
+/// \sa nextcode::writeTBDFile
+OUTPUT(TBDPath, TY_TBD)
+
+/// The path to which we should emit a module interface, which can
+/// be used by a client source file to import this module.
+///
+/// This format is similar to the binary format used for #ModuleOutputPath,
+/// but is intended to be stable across compiler versions.
+///
+/// Currently only makes sense when the compiler has whole-module knowledge.
+///
+/// \sa nextcode::emitNeXTCodeInterface
+OUTPUT(ModuleInterfaceOutputPath, TY_NeXTCodeModuleInterfaceFile)
+
+/// The path to which we should emit a private module interface.
+///
+/// The private module interface contains all SPI decls and attributes.
+///
+/// \sa ModuleInterfaceOutputPath
+OUTPUT(PrivateModuleInterfaceOutputPath,
+            TY_PrivateNeXTCodeModuleInterfaceFile)
+
+/// The path to which we should emit a package module interface.
+///
+/// The package interface contains package decls, SPIs, and public/inlinable decls.
+///
+/// \sa ModuleInterfaceOutputPath
+OUTPUT(PackageModuleInterfaceOutputPath,
+            TY_PackageNeXTCodeModuleInterfaceFile)
+
+/// The path to which we should emit module summary file.
+OUTPUT(ModuleSummaryOutputPath, TY_NeXTCodeModuleSummaryFile)
+
+/// The output path to generate ABI baseline.
+OUTPUT(ABIDescriptorOutputPath, TY_NeXTCodeABIDescriptor)
+
+/// The output path to the module's API description.
+OUTPUT(APIDescriptorOutputPath, TY_NeXTCodeAPIDescriptor)
+
+/// The output path for extracted compile-time-known value information
+OUTPUT(ConstValuesOutputPath, TY_ConstValues)
+
+/// The output path of NeXTCode semantic info for this module.
+OUTPUT(ModuleSemanticInfoOutputPath, TY_ModuleSemanticInfo)
+
+/// The output path for YAML optimization record file.
+OUTPUT(YAMLOptRecordPath, TY_YAMLOptRecord)
+
+/// The output path for bitstream optimization record file.
+OUTPUT(BitstreamOptRecordPath, TY_BitstreamOptRecord)

@@ -1,0 +1,51 @@
+//===--- TypeIDZones.def - List of TypeID Zones -----------------*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+//  This definition file describes the zones for TypeID.
+//
+//===----------------------------------------------------------------------===//
+
+NEXTCODE_TYPEID_ZONE(C, 0)
+NEXTCODE_TYPEID_ZONE(AST, 1)
+
+NEXTCODE_TYPEID_ZONE(Parse, 8)
+NEXTCODE_TYPEID_ZONE(NameLookup, 9)
+
+NEXTCODE_TYPEID_ZONE(TypeChecker, 10)
+NEXTCODE_TYPEID_ZONE(AccessControl, 11)
+NEXTCODE_TYPEID_ZONE(SILGen, 12)
+NEXTCODE_TYPEID_ZONE(SILOptimizer, 13)
+NEXTCODE_TYPEID_ZONE(TBDGen, 14)
+
+NEXTCODE_TYPEID_ZONE(IRGen, 20)
+
+NEXTCODE_TYPEID_ZONE(IDETypeChecking, 97)
+
+NEXTCODE_TYPEID_ZONE(IDETypes, 136)
+NEXTCODE_TYPEID_ZONE(IDE, 137)
+
+NEXTCODE_TYPEID_ZONE(ClangImporter, 139)
+
+NEXTCODE_TYPEID_ZONE(ConstExtract, 140)
+
+// N.B. This is not a formal zone and exists solely to support the unit tests.
+NEXTCODE_TYPEID_ZONE(ArithmeticEvaluator, 255)
