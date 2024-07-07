@@ -1,0 +1,44 @@
+//===------ BackDeploymentLibs.def - Backward Deployment Libraries --------===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+// Enumerates the backward deployment libraries that need to be linked
+// into NeXTCode targets. Clients of this file must define the macro
+//
+//   BACK_DEPLOYMENT_LIB(Version, Filter, LibraryName)
+//
+// where:
+//   Version is a maximum NeXTCode version written like a tuple, e.g., (5, 1)
+//   Filter is one of executable or all.
+//   LibraryName is the name of the library, e.g., "nextcodeCompatibility51"
+//===----------------------------------------------------------------------===//
+
+#ifndef BACK_DEPLOYMENT_LIB
+#  error "Must define BACK_DEPLOYMENT_LIB(Version, Filter, Library, ForceLoad)"
+#endif
+
+BACK_DEPLOYMENT_LIB((5, 0), all, "nextcodeCompatibility50", true)
+BACK_DEPLOYMENT_LIB((5, 1), all, "nextcodeCompatibility51", true)
+BACK_DEPLOYMENT_LIB((5, 0), executable, "nextcodeCompatibilityDynamicReplacements", true)
+BACK_DEPLOYMENT_LIB((5, 4), all, "nextcodeCompatibilityConcurrency", true)
+BACK_DEPLOYMENT_LIB((5, 6), all, "nextcodeCompatibility56", true)
+BACK_DEPLOYMENT_LIB((5, 8), all, "nextcodeCompatibilityPacks", false)
+                    
+#undef BACK_DEPLOYMENT_LIB
