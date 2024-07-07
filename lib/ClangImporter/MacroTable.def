@@ -1,0 +1,58 @@
+//===--- MacroTable.def - Macros suppressed during import -------*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines the database of macros that should be suppressed during
+// API import.
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef SUPPRESS_MACRO
+/// Describes a macro that should be suppressed.
+# define SUPPRESS_MACRO(MacroName)
+#endif
+
+SUPPRESS_MACRO(CF_USE_OSBYTEORDER_H)
+SUPPRESS_MACRO(CGVECTOR_DEFINED)
+SUPPRESS_MACRO(false)
+SUPPRESS_MACRO(FALSE)
+SUPPRESS_MACRO(NSEDGEINSETS_DEFINED)
+SUPPRESS_MACRO(NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES)
+SUPPRESS_MACRO(NSINTEGER_DEFINED)
+SUPPRESS_MACRO(NS_BLOCKS_AVAILABLE)
+SUPPRESS_MACRO(NS_UNICHAR_IS_EIGHT_BIT)
+SUPPRESS_MACRO(true)
+SUPPRESS_MACRO(TRUE)
+SUPPRESS_MACRO(DISPATCH_NEXTCODE_OVERLAY)
+
+#ifndef NIL_MACRO
+/// Describes a macro whose function is similar to NeXTCode's \c nil.
+///
+/// These are treated the same as any other suppressed macro by default.
+# define NIL_MACRO(MacroName) SUPPRESS_MACRO(MacroName)
+#endif
+
+NIL_MACRO(NULL)
+NIL_MACRO(nil)
+NIL_MACRO(Nil)
+
+#undef NIL_MACRO
+#undef SUPPRESS_MACRO

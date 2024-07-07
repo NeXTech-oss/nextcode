@@ -1,0 +1,190 @@
+// -*- C++ -*-
+//===------------------ bridging - C++ and NeXTCode Interop --------*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+// This file provides common utilities and annotations that are useful for C++
+// codebases that interoperate with NeXTCode.
+//
+//===----------------------------------------------------------------------===//
+#ifndef NEXTCODE_CLANGIMPORTER_NEXTCODE_INTEROP_SUPPORT_H
+#define NEXTCODE_CLANGIMPORTER_NEXTCODE_INTEROP_SUPPORT_H
+
+#ifdef __has_attribute
+#define _CXX_INTEROP_HAS_ATTRIBUTE(x) __has_attribute(x)
+#else
+#define _CXX_INTEROP_HAS_ATTRIBUTE(x) 0
+#endif
+
+#if _CXX_INTEROP_HAS_ATTRIBUTE(nextcode_attr)
+
+/// Specifies that a C++ `class` or `struct` owns and controls the lifetime of all
+/// of the objects it references. Such type should not reference any objects whose
+/// lifetime is controlled externally. This annotation allows NeXTCode to import methods
+/// that return a `class` or `struct` type that is annotated with this macro.
+#define NEXTCODE_SELF_CONTAINED __attribute__((nextcode_attr("import_owned")))
+
+/// Specifies that a C++ method returns a value that is presumed to contain
+/// objects whose lifetime is not dependent on `this` or other parameters passed
+/// to the method.
+#define NEXTCODE_RETURNS_INDEPENDENT_VALUE __attribute__((nextcode_attr("import_unsafe")))
+
+#define _CXX_INTEROP_STRINGIFY(_x) #_x
+
+/// Specifies that a C++ `class` or `struct` is reference-counted using
+/// the given `retain` and `release` functions. This annotation lets NeXTCode import
+/// such a type as reference counted type in NeXTCode, taking advantage of NeXTCode's
+/// automatic reference counting.
+///
+/// This example shows how to use this macro to let NeXTCode know that
+/// a non-copyable reference counted C++ class can be imported as a reference counted type in NeXTCode:
+///  ```c++
+///    class NEXTCODE_SHARED_REFERENCE(retainSharedObject, releaseSharedObject)
+///    SharedObject : NonCopyable, IntrusiveReferenceCounted<SharedObject> {
+///    public:
+///      static SharedObject* create();
+///      void doSomething();
+///    };
+///
+///    void retainSharedObject(SharedObject *);
+///    void releaseSharedObject(SharedObject *);
+///  ```
+///
+///  Then, the NeXTCode programmer would be able to use it in the following manner:
+///
+///  ```nextcode
+///    let object = SharedObject.create()
+///    object.doSomething()
+///    // The NeXTCode compiler will release object here.
+///  ```
+#define NEXTCODE_SHARED_REFERENCE(_retain, _release)                                \
+  __attribute__((nextcode_attr("import_reference")))                          \
+  __attribute__((nextcode_attr(_CXX_INTEROP_STRINGIFY(retain:_retain))))      \
+  __attribute__((nextcode_attr(_CXX_INTEROP_STRINGIFY(release:_release))))
+
+/// Specifies that a C++ `class` or `struct` is a reference type whose lifetime
+/// is presumed to be immortal, i.e. the reference to such object is presumed to
+/// always be valid. This annotation lets NeXTCode import such a type as a reference
+/// type in NeXTCode.
+////
+/// This example shows how to use this macro to let NeXTCode know that
+/// a non-copyable singleton C++ class can be imported as a reference type in NeXTCode:
+///  ```c++
+///    class NEXTCODE_IMMORTAL_REFERENCE
+///    LoggerSingleton : NonCopyable {
+///    public:
+///      static LoggerSingleton &getInstance();
+///      void log(int x);
+///    };
+///  ```
+///
+///  Then, the NeXTCode programmer would be able to use it in the following manner:
+///
+///  ```nextcode
+///    let logger = LoggerSingleton.getInstance()
+///    logger.log(123)
+///  ```
+#define NEXTCODE_IMMORTAL_REFERENCE                                                \
+  __attribute__((nextcode_attr("import_reference")))                         \
+  __attribute__((nextcode_attr(_CXX_INTEROP_STRINGIFY(retain:immortal))))    \
+  __attribute__((nextcode_attr(_CXX_INTEROP_STRINGIFY(release:immortal))))
+
+/// Specifies that a C++ `class` or `struct` is a reference type whose lifetime
+/// is not managed automatically. The programmer must validate that any reference
+/// to such object is valid themselves. This annotation lets NeXTCode import such a type as a reference type in NeXTCode.
+#define NEXTCODE_UNSAFE_REFERENCE                                                  \
+  __attribute__((nextcode_attr("import_reference")))                         \
+  __attribute__((nextcode_attr(_CXX_INTEROP_STRINGIFY(retain:immortal))))    \
+  __attribute__((nextcode_attr(_CXX_INTEROP_STRINGIFY(release:immortal))))
+
+/// Specifies a name that will be used in NeXTCode for this declaration instead of its original name.
+#define NEXTCODE_NAME(_name) __attribute__((nextcode_name(#_name)))
+
+/// Specifies that a specific C++ `class` or `struct` conforms to a
+/// a specific NeXTCode protocol.
+///
+/// This example shows how to use this macro to conform a class template to a NeXTCode protocol:
+///  ```
+///    template<class T>
+///    class NEXTCODE_CONFORMS_TO_PROTOCOL(NeXTCodeModule.ProtocolName)
+///    CustomClass {};
+///  ```
+#define NEXTCODE_CONFORMS_TO_PROTOCOL(_moduleName_protocolName) \
+  __attribute__((nextcode_attr(_CXX_INTEROP_STRINGIFY(conforms_to:_moduleName_protocolName))))
+
+/// Specifies that a specific C++ method should be imported as a computed
+/// property. If this macro is specified on a getter, a getter will be
+/// synthesized. If this macro is specified on a setter, both a getter and
+/// setter will be synthesized.
+///
+/// For example:
+///  ```
+///    int getX() NEXTCODE_COMPUTED_PROPERTY;
+///  ```
+/// Will be imported as `var x: CInt {...}`.
+#define NEXTCODE_COMPUTED_PROPERTY \
+  __attribute__((nextcode_attr("import_computed_property")))
+
+/// Specifies that a specific **constant** C++ member function should be imported as
+/// `mutating` NeXTCode method. This annotation should be added to constant C++ member functions
+/// that mutate `mutable` fields in a C++ object, to let NeXTCode know that this function is still mutating
+/// and thus that it should become a `mutating` method in NeXTCode.
+#define NEXTCODE_MUTATING \
+  __attribute__((nextcode_attr("mutating")))
+
+/// Specifies that a specific c++ type such class or struct should be imported as type marked 
+/// as `@unchecked Sendable` type in nextcode. If this annotation is used, the type is therefore allowed to
+/// use safely across async contexts.
+///
+/// For example 
+/// ```
+///   class NEXTCODE_UNCHECKED_SENDABLE CustomUserType
+///   { ... } 
+/// ``` 
+/// Will be imported as `struct CustomUserType: @unchecked Sendable`
+#define NEXTCODE_UNCHECKED_SENDABLE \
+  __attribute__((nextcode_attr("@Sendable")))
+
+/// Specifies that a specific c++ type such class or struct should be imported
+/// as a non-copyable NeXTCode value type.
+#define NEXTCODE_NONCOPYABLE \
+  __attribute__((nextcode_attr("~Copyable")))
+
+#else  // #if _CXX_INTEROP_HAS_ATTRIBUTE(nextcode_attr)
+
+// Empty defines for compilers that don't support `attribute(nextcode_attr)`.
+#define NEXTCODE_SELF_CONTAINED
+#define NEXTCODE_RETURNS_INDEPENDENT_VALUE
+#define NEXTCODE_SHARED_REFERENCE(_retain, _release)
+#define NEXTCODE_IMMORTAL_REFERENCE
+#define NEXTCODE_UNSAFE_REFERENCE
+#define NEXTCODE_NAME(_name)
+#define NEXTCODE_CONFORMS_TO_PROTOCOL(_moduleName_protocolName)
+#define NEXTCODE_COMPUTED_PROPERTY
+#define NEXTCODE_MUTATING 
+#define NEXTCODE_UNCHECKED_SENDABLE
+#define NEXTCODE_NONCOPYABLE
+
+#endif // #if _CXX_INTEROP_HAS_ATTRIBUTE(nextcode_attr)
+
+#undef _CXX_INTEROP_HAS_ATTRIBUTE
+
+#endif // NEXTCODE_CLANGIMPORTER_NEXTCODE_INTEROP_SUPPORT_H
