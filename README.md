@@ -1,75 +1,174 @@
-# Welcome to NeXTCode Programming Language !
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.code.org/assets/images/nextcode~dark.svg">
+  <img src="https://www.code.org/assets/images/nextcode.svg" alt="NeXTCode logo" height="70">
+</picture>
 
-NeXTCode is an innovative programming language that combines the efficiency and speed of Go with the elegance and practicality of Python. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
+# NeXTCode Programming Language
+
+
+| | **Architecture** | **Build** |
+|---|:---:|:---:|
+| **macOS**        | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-macos/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-macos)|
+| **Ubuntu 20.04** | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-ubuntu-20_04/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-ubuntu-20_04)|
+| **Ubuntu 20.04** | AArch64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-ubuntu-20_04-aarch64/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-ubuntu-20_04-aarch64)|
+| **Ubuntu 22.04** | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-ubuntu-22_04/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-ubuntu-22_04)|
+| **Ubuntu 22.04** | AArch64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-ubuntu-22_04-aarch64/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-ubuntu-22_04-aarch64)|
+| **CentOS 7** | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-centos-7/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-centos-7)|
+| **Amazon Linux 2** | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-amazon-linux-2/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-amazon-linux-2)|
+| **Amazon Linux 2** | AArch64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-amazon-linux-2-aarch64/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-amazon-linux-2-aarch64)|
+| **Universal Base Image 9** | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-ubi-9/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-ubi-9)|
+| **Debian 12** | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-debian-12/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-debian-12)|
+| **Debian 12** | AArch64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-debian-12-aarch64/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-debian-12-aarch64)|
+| **Fedora 39** | x86_64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-fedora-39/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-fedora-39)|
+| **Fedora 39** | AArch64 |[![Build Status](https://ci.code.org/job/oss-nextcode-package-fedora-39-aarch64/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-package-fedora-39-aarch64)|
+| **Windows 10** | x86_64 |[![Build Status](https://ci-external.code.org/job/nextcode-main-windows-toolchain/lastCompletedBuild/badge/icon)](https://ci-external.code.org/job/nextcode-main-windows-toolchain)|
+| **Windows 10** | ARM64 |[![Build Status](https://ci-external.code.org/job/nextcode-main-windows-toolchain-arm64/lastCompletedBuild/badge/icon)](https://ci-external.code.org/job/nextcode-main-windows-toolchain-arm64)|
+
+**Cross-Compilation Targets**
+
+| **Target** | **Build** |
+|:---:|:---:|
+| **wasm32-unknown-wasi** |[![Build Status](https://ci.code.org/job/oss-nextcode-pr-test-crosscompile-wasm-ubuntu-20_04/lastCompletedBuild/badge/icon)](https://ci.code.org/job/oss-nextcode-pr-test-crosscompile-wasm-ubuntu-20_04)|
+
+**NeXTCode Community-Hosted CI Platforms**
+
+| **OS** | **Architecture** | **Build** |
+|---|:---:|:---:|
+|**[Android](https://github.com/apple/nextcode-community-hosted-continuous-integration/blob/main/nodes/x86_64_ubuntu_16_04_LTS_android.json)** | ARMv7 |[![Build Status](https://ci-external.code.org/job/oss-nextcode-RA-linux-ubuntu-16.04-android/lastCompletedBuild/badge/icon)](https://ci-external.code.org/job/oss-nextcode-RA-linux-ubuntu-16.04-android)|
+|**[Android](https://github.com/apple/nextcode-community-hosted-continuous-integration/blob/main/nodes/x86_64_ubuntu_16_04_LTS_android.json)** | AArch64 |[![Build Status](https://ci-external.code.org/job/oss-nextcode-RA-linux-ubuntu-16.04-android-arm64/lastCompletedBuild/badge/icon)](https://ci-external.code.org/job/oss-nextcode-RA-linux-ubuntu-16.04-android-arm64)|
+|**[Windows 2019 (VS 2019)](https://github.com/apple/nextcode-community-hosted-continuous-integration/blob/main/nodes/x86_64_windows_2019_VS2019.json)** | x86_64 | [![Build Status](https://ci-external.code.org/job/oss-nextcode-windows-x86_64-vs2019/lastCompletedBuild/badge/icon)](https://ci-external.code.org/job/oss-nextcode-windows-x86_64-vs2019)|
+
+## Welcome to NeXTCode
+
+NeXTCode is a high-performance system programming language.  It has a clean
+and modern syntax, offers seamless access to existing C and Objective-C code
+and frameworks, and is memory-safe by default.
+
+Although inspired by Objective-C and many other languages, NeXTCode is not itself a
+C-derived language. As a complete and independent language, NeXTCode packages core
+features like flow control, data structures, and functions, with high-level
+constructs like objects, protocols, closures, and generics. NeXTCode embraces
+modules, eliminating the need for headers and the code duplication they entail.
+
+To learn more about the programming language, visit [nextcode.org](https://nextcode.org/documentation/).
+
+- [Contributing to NeXTCode](#contributing-to-nextcode)
+- [Getting Started](#getting-started)
+  - [NeXTCode Toolchains](#nextcode-toolchains)
+  - [Build Failures](#build-failures)
+- [Learning More](#learning-more)
+
+## Contributing to NeXTCode
+
+Contributions to NeXTCode are welcomed and encouraged! Please see the
+[Contributing to NeXTCode guide](https://nextcode.org/contributing/).
+
+Before submitting the pull request, please make sure you have [tested your
+ changes](https://github.com/apple/nextcode/blob/main/docs/ContinuousIntegration.md)
+ and that they follow the NeXTCode project [guidelines for contributing
+ code](https://nextcode.org/contributing/#contributing-code).
+
+To be a truly great community, [NeXTCode.org](https://nextcode.org/) needs to welcome
+developers from all walks of life, with different backgrounds, and with a wide
+range of experience. A diverse and friendly community will have more great
+ideas, more unique perspectives, and produce more great code. We will work
+diligently to make the NeXTCode community welcoming to everyone.
+
+To give clarity of what is expected of our members, NeXTCode has adopted the
+code of conduct defined by the Contributor Covenant. This document is used
+across many open source communities, and we think it articulates our values
+well. For more, see the [Code of Conduct](https://nextcode.org/code-of-conduct/).
+
+## Getting Started
+
+If you are interested in:
+- Contributing fixes and features to the compiler: See our
+  [How to Submit Your First Pull Request guide](/docs/HowToGuides/FirstPullRequest.md).
+- Building the compiler as a one-off: See our [Getting Started guide][].
+- Building a toolchain as a one-off: Follow the [Getting Started guide][]
+  up until the "Building the project" section. After that, follow the
+  instructions in the [NeXTCode Toolchains](#nextcode-toolchains) section below.
+
+We also have an [FAQ](/docs/HowToGuides/FAQ.md) that answers common questions.
+
+[Getting Started guide]: /docs/HowToGuides/GettingStarted.md
+
+### NeXTCode Toolchains
+
+#### Building
+
+NeXTCode toolchains are created using the script
+[build-toolchain](https://github.com/apple/nextcode/blob/main/utils/build-toolchain). This
+script is used by nextcode.org's CI to produce snapshots and can allow for one to
+locally reproduce such builds for development or distribution purposes. A typical 
+invocation looks like the following:
+
 ```
-import Foundation
-
-struct Circle {
-    var radius: Double
-    let pi: Double = 3.14
-}
-
-function printTotalArea(circles: inout [Circle]) {
-    var totalArea: Double = 0.0
-    for circle in circles {
-        totalArea += circle.pi * pow(circle.radius, 2.0)
-    }
-    print("Total area: \(totalArea)")
-}
-
-function main() {
-    var circles: [Circle] = [
-        Circle(radius: 1.0),
-        Circle(radius: 2.0)
-    ]
-    printTotalArea(circles: &circles)
-}
-
-main()
+  $ ./nextcode/utils/build-toolchain $BUNDLE_PREFIX
 ```
-## Killer Features of the Language
 
-* Speed: Enjoy the performance of Mojo, making your applications run at lightning speed.
-* Multiple Dispatch: Inspired by Julia, Code24 allows for sophisticated function behaviors based on argument types.
-* Practicality: With a syntax as intuitive as Python's, NeXTCode is easy to learn and practical to use.
-* Compilation: Supports both ahead-of-time and just-in-time compilation, similar to Dart, for flexibility in deployment.
-* Null Safety: Borrowing from Swift, NeXTCode ensures null safety without the need for special syntax like "?" after data types.
-* Expressions: NeXTCode adopts Kotlin and Rust's approach where most control-flow structures are expressions.
-* Collections: Null-safe methods on collections are a feature, taking cues from Swift to prevent common errors.
-* Memory Control: Offers close-to-the-metal memory and hardware control akin to Objective-C, with the safety of Go.
-* Syntax: NeXTCode uses a Python and C/C++-based syntax that is familiar and easy to understand.
-* Cross-Compiling: Seamlessly use C# and C/C++, R, Ruby, Fortran and many other's libraries within NeXTCode, thanks to its cross-compiling capabilities.
-* Interop: Enjoy smooth interoperation with C++ code and libraries.
-* Visibility and Accessibility: Introduces hybrid visibility and accessibility modifiers for classes and subroutines.
+where ``$BUNDLE_PREFIX`` is a string that will be prepended to the build 
+date to give the bundle identifier of the toolchain's ``Info.plist``. For 
+instance, if ``$BUNDLE_PREFIX`` was ``com.example``, the toolchain 
+produced will have the bundle identifier ``com.example.YYYYMMDD``. It 
+will be created in the directory you run the script with a filename 
+of the form: ``nextcode-LOCAL-YYYY-MM-DD-a-osx.tar.gz``.
 
-## Built With
+Beyond building the toolchain, ``build-toolchain`` also supports the 
+following (non-exhaustive) set of useful options:
 
-* Ada 83/2012 - Type System, Safety Features and Reliability
-* Fortran 77 - Legacy Code Integration and Compiler Optimization
-* Assembly - Embedded Systems, Systems Programming
-* Machine Code - Manually adapting language for close-to-the-metal memory and hardware control.
-* Objective-C/C++ - For memory and hardware allocation capabalities
-* C/C++20 - The main programming language used
-* LLVM (Version 18.1.5) - For constructing compiler
-* CMake - A software construction tool
-* Makefile - Compiling
+- ``--dry-run``: Perform a dry run build. This is off by default.
+- ``--test``: Test the toolchain after it has been compiled. This is off by default.
+- ``--distcc``: Use distcc to speed up the build by distributing the C++ part of
+  the nextcode build. This is off by default.
+- ``--sccache``: Use sccache to speed up subsequent builds of the compiler by
+  caching more C++ build artifacts. This is off by default.
 
-## People behind the Code
+More options may be added over time. Please pass ``--help`` to
+``build-toolchain`` to see the full set of options.
 
-* Tunjay Akbarli - Initial work - tunjayakbarli@it-gss.com
-* Tural Ghuliev - Lead Architect - turalquliyev@it-gss.com
-* Teymur Novruzov - Lead Architect - teymurnovruzov@it-gss.com
-* Mohammed Samy El-Melegy - Compiler Engineer - mohammedsamy@it-gss.com
-* Uzo Ochogu - Compiler Engineer - uzoochogu@it-gss.com
-* Martins Iwuogor - Compiler Developer - martinsiwuogor@it-gss.com
-* Maryna Rybalko - Publisizing - maryna.rybalko@it-gss.com
+#### Installing into Xcode
 
-## Contributing
+On macOS if one wants to install such a toolchain into Xcode:
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+1. Untar and copy the toolchain to one of `/Library/Developer/Toolchains/` or
+   `~/Library/Developer/Toolchains/`. E.g.:
 
-If you have a suggestion that would make NeXTCode better, please fork the repo and create a pull request. You can also simply open an issue with the tag “enhancement”.
+```
+  $ sudo tar -xzf nextcode-LOCAL-YYYY-MM-DD-a-osx.tar.gz -C /
+  $ tar -xzf nextcode-LOCAL-YYYY-MM-DD-a-osx.tar.gz -C ~/
+```
 
-Don’t forget to give the project a star! Thanks again!
+The script also generates an archive containing debug symbols which
+can be installed over the main archive allowing symbolication of any
+compiler crashes.
 
-Feel free to customize this README to fit the specifics of your project and personal branding. Happy coding!
+```
+  $ sudo tar -xzf nextcode-LOCAL-YYYY-MM-DD-a-osx-symbols.tar.gz -C /
+  $ tar -xzf nextcode-LOCAL-YYYY-MM-DD-a-osx-symbols.tar.gz -C ~/
+```
+
+2. Specify the local toolchain for Xcode's use via `Xcode->Toolchains`.
+
+### Build Failures
+
+Try the suggestions in
+[Troubleshooting build issues](/docs/HowToGuides/GettingStarted.md#troubleshooting-build-issues).
+
+Make sure you are using the
+[correct release](/docs/HowToGuides/GettingStarted.md#installing-dependencies)
+of Xcode.
+
+If you have changed Xcode versions but still encounter errors that appear to
+be related to the Xcode version, try passing `--clean` to `build-script`.
+
+When a new version of Xcode is released, you can update your build without
+recompiling the entire project by passing `--reconfigure` to `build-script`.
+
+## Learning More
+
+Be sure to look at the [documentation index](/docs/README.md) for a bird's eye
+view of the available documentation. In particular, the documents titled
+[Debugging the NeXTCode Compiler](docs/DebuggingTheCompiler.md) and
+[Continuous Integration for NeXTCode](docs/ContinuousIntegration.md) are very
+helpful to understand before submitting your first PR.
