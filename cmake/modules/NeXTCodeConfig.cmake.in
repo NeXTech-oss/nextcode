@@ -1,0 +1,34 @@
+# This file provides information and services to the final user.
+
+@NEXTCODE_CONFIG_CODE@
+
+set(NEXTCODE_VERSION_MAJOR @NEXTCODE_VERSION_MAJOR@)
+set(NEXTCODE_VERSION_MINOR @NEXTCODE_VERSION_MINOR@)
+set(NEXTCODE_VERSION_PATCH @NEXTCODE_VERSION_PATCHLEVEL@)
+
+set(NEXTCODE_VERSION @NEXTCODE_VERSION@)
+set(NEXTCODE_MAIN_SRC_DIR @NEXTCODE_SOURCE_DIR@)
+
+set(NEXTCODE_INCLUDE_DIRS "@NEXTCODE_INCLUDE_DIRS@")
+set(NEXTCODE_LIBRARY_DIRS "@NEXTCODE_LIBRARY_DIRS@")
+
+# These variables are duplicated, but they must match the LLVM variables of the
+# same name. The variables ending in "S" could some day become lists, and are
+# preserved for convention and compatibility.
+set(NEXTCODE_INCLUDE_DIR "@NEXTCODE_INCLUDE_DIRS@")
+set(NEXTCODE_LIBRARY_DIR "@NEXTCODE_LIBRARY_DIRS@")
+
+set(NEXTCODE_CMAKE_DIR "@NEXTCODE_CMAKE_DIR@")
+set(NEXTCODE_BINARY_DIR "@NEXTCODE_BINARY_DIR@")
+
+set(BOOTSTRAPPING_MODE "@BOOTSTRAPPING_MODE@")
+
+set(CMARK_TARGETS_FILE @NEXTCODE_PATH_TO_CMARK_BUILD@/src/cmarkTargets.cmake)
+if(NOT TARGET libcmark_static AND EXISTS ${CMARK_TARGETS_FILE})
+  include(${CMARK_TARGETS_FILE})
+endif()
+
+if(NOT TARGET nextcode)
+  set(NEXTCODE_EXPORTED_TARGETS "@NEXTCODE_CONFIG_EXPORTS@")
+  include("@NEXTCODE_EXPORTS_FILE@")
+endif()
