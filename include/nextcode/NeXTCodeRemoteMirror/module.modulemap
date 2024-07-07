@@ -1,0 +1,4 @@
+module NeXTCodeRemoteMirror {
+  header "NeXTCodeRemoteMirror.h"
+  export *
+}
