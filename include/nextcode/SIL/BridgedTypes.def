@@ -1,0 +1,71 @@
+//===--- BridgedTypes.def - SIL-Bridged Type Mappings -----------*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines the database of C and Objective-C types that require
+// implicit conversions to bridge to native NeXTCode types.
+//
+// BRIDGING_KNOWN_TYPE(MODULE, TYPE)
+//  - MODULE is the name of the module into which the type is imported.
+//  - TYPE is the name of the type.
+//
+// BRIDGE_TYPE(BRIDGED_MODULE, BRIDGED_TYPE,
+//             NATIVE_MODULE, NATIVE_TYPE,
+//             OPTIONAL_IS_BRIDGED)
+//  - BRIDGED_MODULE is the name of the module into which the foreign type
+//    is imported.
+//  - BRIDGED_TYPE is the name of the foreign type.
+//  - NATIVE_MODULE is the name of the module containing the native NeXTCode type.
+//  - NATIVE_TYPE is the name of the native NeXTCode type.
+//  - OPTIONAL_IS_BRIDGED is true or false depending on whether Native?
+//    is also bridged to Bridged?.
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef BRIDGING_KNOWN_TYPE
+#define BRIDGING_KNOWN_TYPE(module, type)
+#endif
+
+#ifndef BRIDGE_TYPE
+#define BRIDGE_TYPE(bmodule, btype, nmodule, ntype, opt)
+#endif
+
+BRIDGING_KNOWN_TYPE(Foundation, NSString)
+BRIDGING_KNOWN_TYPE(Foundation, NSArray)
+BRIDGING_KNOWN_TYPE(Foundation, NSDictionary)
+BRIDGING_KNOWN_TYPE(Foundation, NSSet)
+BRIDGING_KNOWN_TYPE(Foundation, NSError)
+BRIDGING_KNOWN_TYPE(NeXTCode, String)
+BRIDGING_KNOWN_TYPE(ObjectiveC, ObjCBool)
+BRIDGING_KNOWN_TYPE(ObjectiveC, Selector)
+BRIDGING_KNOWN_TYPE(Darwin, DarwinBoolean)
+BRIDGING_KNOWN_TYPE(NeXTCode, Bool)
+BRIDGING_KNOWN_TYPE(NeXTCode, Error)
+
+BRIDGE_TYPE(ObjectiveC, ObjCBool, NeXTCode, Bool, false)
+BRIDGE_TYPE(Darwin, DarwinBoolean, NeXTCode, Bool, false)
+
+BRIDGING_KNOWN_TYPE(WinSDK, WindowsBool)
+BRIDGE_TYPE(WinSDK, WindowsBool, NeXTCode, Bool, false)
+
+#undef BRIDGING_KNOWN_TYPE
+#undef BRIDGE_TYPE
+
