@@ -1,0 +1,130 @@
+//===--- NameLookupTypeIDZone.def -------------------------------*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+//  This definition file describes the types in the name-lookup
+//  TypeID zone, for use with the TypeID template.
+//
+//===----------------------------------------------------------------------===//
+
+NEXTCODE_REQUEST(NameLookup, AnyObjectLookupRequest,
+              QualifiedLookupResult(const DeclContext *, DeclName, NLOptions),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, CustomAttrNominalRequest,
+              NominalTypeDecl *(CustomAttr *, DeclContext *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, DirectLookupRequest,
+              TinyPtrVector<ValueDecl *>(DirectLookupDescriptor), Uncached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, DirectOperatorLookupRequest,
+              TinyPtrVector<OperatorDecl *>(OperatorLookupDescriptor,
+                                            OperatorFixity),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, DirectPrecedenceGroupLookupRequest,
+              TinyPtrVector<PrecedenceGroupDecl *>(OperatorLookupDescriptor),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, ExtendedNominalRequest,
+              NominalTypeDecl *(ExtensionDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, GenericParamListRequest,
+              GenericParamList *(GenericContext *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, GetDestructorRequest, DestructorDecl *(ClassDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, InheritedDeclsReferencedRequest,
+              DirectlyReferencedTypeDecls(
+                  llvm::PointerUnion<const TypeDecl *,
+                                     const ExtensionDecl *>, unsigned),
+              Uncached, HasNearestLocation)
+NEXTCODE_REQUEST(NameLookup, InheritedProtocolsRequest,
+              ArrayRef<ProtocolDecl *>(ProtocolDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, AllInheritedProtocolsRequest,
+              ArrayRef<ProtocolDecl *>(ProtocolDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, ProtocolRequirementsRequest,
+              ArrayRef<ValueDecl *>(ProtocolDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, LookupConformanceInModuleRequest,
+              ProtocolConformanceRef(LookupConformanceDescriptor),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, LookupInModuleRequest,
+              QualifiedLookupResult(const DeclContext *, DeclName, NLKind,
+                                    namelookup::ResolutionKind,
+                                    const DeclContext *),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, ModuleQualifiedLookupRequest,
+              QualifiedLookupResult(
+                  const DeclContext *, ModuleDecl *, DeclNameRef, NLOptions),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, QualifiedLookupRequest,
+              QualifiedLookupResult(
+                  const DeclContext *, SmallVector<NominalTypeDecl *, 4>,
+                  DeclNameRef, NLOptions),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, SelfBoundsFromWhereClauseRequest,
+              SelfBounds(llvm::PointerUnion<const TypeDecl *,
+                                            const ExtensionDecl *>),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, SelfBoundsFromGenericSignatureRequest,
+              SelfBounds(const ExtensionDecl * extDecl),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, SuperclassDeclRequest, ClassDecl *(NominalTypeDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, HasMissingDesignatedInitializersRequest,
+              bool(ClassDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, TypeDeclsFromWhereClauseRequest,
+              DirectlyReferencedTypeDecls(ExtensionDecl *), Uncached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, UnderlyingTypeDeclsReferencedRequest,
+              DirectlyReferencedTypeDecls(TypeAliasDecl *), Uncached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, UnqualifiedLookupRequest,
+              LookupResult(UnqualifiedLookupDescriptor), Uncached,
+              NoLocationInfo)
+
+NEXTCODE_REQUEST(NameLookup, LookupPrefixOperatorRequest,
+              PrefixOperatorDecl *(OperatorLookupDescriptor),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, LookupInfixOperatorRequest,
+              TinyPtrVector<InfixOperatorDecl *>(OperatorLookupDescriptor),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, LookupPostfixOperatorRequest,
+              PostfixOperatorDecl *(OperatorLookupDescriptor),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, LookupPrecedenceGroupRequest,
+              TinyPtrVector<PrecedenceGroupDecl *>(OperatorLookupDescriptor),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, IsCallAsFunctionNominalRequest,
+              bool(NominalTypeDecl *, DeclContext *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, HasDynamicMemberLookupAttributeRequest,
+              bool(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, HasDynamicCallableAttributeRequest,
+              bool(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, PotentialMacroExpansionsInContextRequest,
+              PotentialMacroExpansions(TypeOrExtension), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, ImplementsAttrProtocolRequest,
+              ProtocolDecl *(const ImplementsAttr *, DeclContext *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, LookupIntrinsicRequest,
+              FuncDecl *(ModuleDecl *, Identifier), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, ObjCCategoryNameMapRequest,
+              ObjCCategoryNameMap(ClassDecl *, ExtensionDecl *), Cached, NoLocationInfo)

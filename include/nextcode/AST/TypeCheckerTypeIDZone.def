@@ -1,0 +1,596 @@
+//===--- TypeCheckerTypeIDZone.def ------------------------------*- C++ -*-===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+//
+//  This definition file describes the types in the type checker's
+//  TypeID zone, for use with the TypeID template.
+//
+//===----------------------------------------------------------------------===//
+
+NEXTCODE_REQUEST(TypeChecker, AbstractGenericSignatureRequest,
+              GenericSignatureWithError (const GenericSignatureImpl *,
+                                         SmallVector<GenericTypeParamType *, 2>,
+                                         SmallVector<Requirement, 2>,
+                                         bool),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ApplyAccessNoteRequest,
+              evaluator::SideEffect(ValueDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, AttachedResultBuilderRequest,
+              CustomAttr *(ValueDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, AttachedPropertyWrapperTypeRequest,
+              Type(VarDecl *, unsigned), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, AttachedPropertyWrappersRequest,
+              llvm::TinyPtrVector<CustomAttr *>(VarDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CallerSideDefaultArgExprRequest,
+              Expr *(DefaultArgumentExpr *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CheckInconsistentImplementationOnlyImportsRequest,
+              evaluator::SideEffect(ModuleDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CheckInconsistentSPIOnlyImportsRequest,
+              evaluator::SideEffect(SourceFile *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CheckInconsistentAccessLevelOnImport,
+              evaluator::SideEffect(SourceFile *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CheckInconsistentAccessLevelOnImportSameFileRequest,
+              evaluator::SideEffect(SourceFile *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CheckInconsistentWeakLinkedImportsRequest,
+              evaluator::SideEffect(ModuleDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CheckRedeclarationRequest,
+              evaluator::SideEffect(ValueDecl *),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ClassAncestryFlagsRequest,
+              AncestryFlags(ClassDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IDEInspectionFileRequest,
+              SourceFile *(ModuleDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CompareDeclSpecializationRequest,
+              bool (DeclContext *, ValueDecl *, ValueDecl *, bool, bool),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ConditionalRequirementsRequest,
+              ArrayRef<Requirement> (NormalProtocolConformance *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsDeclRefinementOfRequest,
+              bool (ValueDecl *, ValueDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CustomAttrTypeRequest,
+              Type(CustomAttr *, DeclContext *, CustomAttrTypeKind),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DefaultArgumentExprRequest,
+              Expr *(ParamDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DefaultArgumentTypeRequest,
+              Type(ParamDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DefaultInitializerIsolation,
+              ActorIsolation(VarDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DefaultArgumentInitContextRequest,
+              Initializer *(ParamDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DefaultDefinitionTypeRequest,
+              Type(AssociatedTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DefaultTypeRequest,
+              Type(KnownProtocolKind, const DeclContext *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DifferentiableAttributeTypeCheckRequest,
+              IndexSubset *(DifferentiableAttr *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DerivativeAttrOriginalDeclRequest,
+              AbstractFunctionDecl *(DerivativeAttr *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, TypeEraserHasViableInitRequest,
+              bool(TypeEraserAttr *, ProtocolDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DynamicallyReplacedDeclRequest,
+              ValueDecl *(ValueDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ABIMembersRequest,
+              ArrayRef<Decl *>(IterableDeclContext *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, AllMembersRequest,
+              ArrayRef<Decl *>(IterableDeclContext *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SpecializeAttrTargetDeclRequest,
+              ValueDecl *(const ValueDecl *, SpecializeAttr *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, EnumRawValuesRequest,
+              evaluator::SideEffect (EnumDecl *, TypeResolutionStage),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, EnumRawTypeRequest,
+              Type(EnumDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExistentialConformsToSelfRequest,
+              bool(ProtocolDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasSelfOrAssociatedTypeRequirementsRequest,
+              bool(ProtocolDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExtendedTypeRequest, Type(ExtensionDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResultBuilderTypeRequest, Type(ValueDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsActorRequest, bool(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsDefaultActorRequest,
+              bool(ClassDecl *, ModuleDecl *, ResilienceExpansion),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CheckDistributedFunctionRequest,
+              bool(AbstractFunctionDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsDistributedActorRequest, bool(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedActorImplicitCodableRequest,
+              NormalProtocolConformance *(NominalTypeDecl *, KnownProtocolKind),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CanSynthesizeDistributedActorCodableConformanceRequest,
+              bool (NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedActorAsActorConformanceRequest,
+              NormalProtocolConformance *(ProtocolDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedActorSystemRemoteCallFunctionRequest,
+              AbstractFunctionDecl *(NominalTypeDecl *, bool),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedTargetInvocationEncoderRecordArgumentFunctionRequest,
+              AbstractFunctionDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedTargetInvocationEncoderRecordReturnTypeFunctionRequest,
+              AbstractFunctionDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedTargetInvocationEncoderRecordErrorTypeFunctionRequest,
+              AbstractFunctionDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedTargetInvocationDecoderDecodeNextArgumentFunctionRequest,
+              AbstractFunctionDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedTargetInvocationResultHandlerOnReturnFunctionRequest,
+              AbstractFunctionDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedThunkRequest,
+              FuncDecl *(llvm::PointerUnion<AbstractStorageDecl *, AbstractFunctionDecl *>),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedActorIDPropertyRequest,
+              VarDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedActorSystemPropertyRequest,
+              VarDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedRemoteCallTargetInitFunctionRequest,
+              ConstructorDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedMethodWitnessedProtocolRequirements,
+              ArrayRef<ValueDecl *> (AbstractFunctionDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedRemoteCallArgumentInitFunctionRequest,
+              ConstructorDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedActorInvocationDecoderRequest,
+              NominalTypeDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetDistributedActorConcreteArgumentDecodingMethodRequest,
+              FuncDecl *(NominalTypeDecl *),
+              Cache, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GlobalActorInstanceRequest,
+              VarDecl *(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GlobalActorAttributeRequest,
+              Optional<CustomAttrNominalPair>(
+                  llvm::PointerUnion<Decl *, ClosureExpr *>),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ActorIsolationRequest,
+              ActorIsolationState(ValueDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasIsolatedSelfRequest,
+              bool(ValueDecl *),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, FunctionOperatorRequest, OperatorDecl *(FuncDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(NameLookup, GenericSignatureRequest,
+              GenericSignature (GenericContext *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasCircularInheritedProtocolsRequest,
+              bool(ProtocolDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasCircularRawValueRequest,
+              bool(EnumDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasImportsMatchingFlagRequest,
+              bool(SourceFile *, ImportOptions), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ModuleLibraryLevelRequest,
+              LibraryLevel(ModuleDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, InferredGenericSignatureRequest,
+              GenericSignatureWithError (const GenericSignatureImpl *,
+                                         GenericParamList *,
+                                         WhereClauseOwner,
+                                         SmallVector<Requirement, 2>,
+                                         SmallVector<TypeBase *, 2>,
+                                         SourceLoc, bool, bool),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, DistributedModuleIsAvailableRequest,
+              bool(const ValueDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, InheritedTypeRequest,
+              Type(llvm::PointerUnion<const TypeDecl *, const ExtensionDecl *>,
+                   unsigned, TypeResolutionStage),
+              SeparatelyCached, HasNearestLocation)
+NEXTCODE_REQUEST(TypeChecker, InheritsSuperclassInitializersRequest,
+              bool(ClassDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, InitKindRequest,
+              CtorInitializerKind(ConstructorDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, BodyInitKindRequest,
+              BodyInitKindAndExpr(ConstructorDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, InterfaceTypeRequest,
+              Type(ValueDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsAccessorTransparentRequest, bool(AccessorDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsDynamicRequest, bool(ValueDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsFinalRequest, bool(ValueDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsGetterMutatingRequest, bool(AbstractStorageDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsImplicitlyUnwrappedOptionalRequest,
+              bool(ValueDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsObjCRequest, bool(ValueDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsSetterMutatingRequest, bool(AbstractStorageDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, LazyStoragePropertyRequest, VarDecl *(VarDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ValidatePrecedenceGroupRequest,
+              PrecedenceGroupDecl *(DeclContext *, Identifier, SourceLoc),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, MangleLocalTypeDeclRequest,
+              std::string(const TypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ModuleImplicitImportsRequest,
+              ImplicitImportList(ModuleDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, NamingPatternRequest,
+              NamedPattern *(VarDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExprPatternMatchRequest,
+              ExprPatternMatchResult(const ExprPattern *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, EnumElementExprPatternRequest,
+              ExprPattern *(const EnumElementPattern *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolvePatternRequest,
+              Pattern *(Pattern *, DeclContext *, bool),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, OpaqueReadOwnershipRequest,
+              OpaqueReadOwnership(AbstractStorageDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, OpaqueResultTypeRequest,
+              OpaqueTypeDecl *(ValueDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, OperatorPrecedenceGroupRequest,
+              PrecedenceGroupDecl *(PrecedenceGroupDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, OverriddenDeclsRequest,
+              llvm::TinyPtrVector<ValueDecl *>(ValueDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PatternBindingEntryRequest,
+              const PatternBindingEntry *(PatternBindingDecl *, unsigned),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PatternBindingCheckedAndContextualizedInitRequest,
+              Expr *(PatternBindingDecl *, unsigned),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PrimarySourceFilesRequest,
+              ArrayRef<SourceFile *>(ModuleDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PropertyWrapperAuxiliaryVariablesRequest,
+              PropertyWrapperAuxiliaryVariables(VarDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PropertyWrapperInitializerInfoRequest,
+              PropertyWrapperInitializerInfo(VarDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PropertyWrapperBackingPropertyTypeRequest,
+              Type(VarDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PropertyWrapperLValuenessRequest,
+              Optional<PropertyWrapperLValueness>(VarDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PropertyWrapperMutabilityRequest,
+              Optional<PropertyWrapperMutability>(VarDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PropertyWrapperTypeInfoRequest,
+              PropertyWrapperTypeInfo(NominalTypeDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ProtocolRequiresClassRequest, bool(ProtocolDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PrimaryAssociatedTypesRequest,
+              ArrayRef<AssociatedTypeDecl *>(ProtocolDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, RequirementRequest,
+              Requirement(WhereClauseOwner, unsigned, TypeResolutionStage),
+              Cached, HasNearestLocation)
+NEXTCODE_REQUEST(TypeChecker, StructuralRequirementsRequest,
+              ArrayRef<StructuralRequirement>(ProtocolDecl *), Cached,
+              HasNearestLocation)
+NEXTCODE_REQUEST(TypeChecker, TypeAliasRequirementsRequest,
+              ArrayRef<Requirement>(ProtocolDecl *), Cached,
+              HasNearestLocation)
+NEXTCODE_REQUEST(TypeChecker, ProtocolDependenciesRequest,
+              ArrayRef<ProtocolDecl *>(ProtocolDecl *), Cached,
+              HasNearestLocation)
+NEXTCODE_REQUEST(TypeChecker, RequirementSignatureRequest,
+              RequirementSignature(ProtocolDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, RequiresOpaqueAccessorsRequest, bool(VarDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, RequiresOpaqueModifyCoroutineRequest,
+              bool(AbstractStorageDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, FragileFunctionKindRequest,
+              FragileFunctionKind(DeclContext *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PolymorphicEffectKindRequest,
+              PolymorphicEffectKind(EffectKind, AbstractFunctionDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SelfAccessKindRequest, SelfAccessKind(FuncDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, StorageImplInfoRequest,
+              StorageImplInfo(AbstractStorageDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasStorageRequest,
+              bool(AbstractStorageDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, StoredPropertiesAndMissingMembersRequest,
+              ArrayRef<Decl *>(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, StoredPropertiesRequest,
+              ArrayRef<VarDecl *>(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, InitAccessorPropertiesRequest,
+              ArrayRef<VarDecl *>(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, MemberwiseInitPropertiesRequest,
+              ArrayRef<VarDecl *>(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, StructuralTypeRequest, Type(TypeAliasDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SuperclassTypeRequest,
+              Type(NominalTypeDecl *, TypeResolutionStage), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SynthesizeAccessorRequest,
+              AccessorDecl *(AbstractStorageDecl *, AccessorKind),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, TangentStoredPropertyRequest,
+              llvm::Expected<VarDecl *>(VarDecl *, CanType), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PreCheckFunctionBodyRequest,
+              BraceStmt *(AbstractFunctionDecl *),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PreCheckClosureBodyRequest,
+              BraceStmt *(ClosureExpr *),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, TypeCheckFunctionBodyRequest,
+              BraceStmt *(AbstractFunctionDecl *), SeparatelyCached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, TypeCheckASTNodeAtLocRequest,
+              bool(TypeCheckASTNodeAtLocContext, SourceLoc),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, UnderlyingTypeRequest, Type(TypeAliasDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, USRGenerationRequest, std::string(const ValueDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsABICompatibleOverrideRequest,
+              bool(ValueDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsStaticRequest,
+              bool(FuncDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, NeedsNewVTableEntryRequest,
+              bool(AbstractFunctionDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ParamSpecifierRequest,
+              ParamDecl::Specifier(ParamDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExplicitCaughtTypeRequest,
+              Type(ASTContext *, CatchNode), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResultTypeRequest,
+              Type(ValueDecl *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, AreAllStoredPropertiesDefaultInitableRequest,
+              bool(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasUserDefinedDesignatedInitRequest,
+              bool(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasMemberwiseInitRequest,
+              bool(StructDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PreCheckResultBuilderRequest,
+              ResultBuilderBodyPreCheck(PreCheckResultBuilderDescriptor),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveImplicitMemberRequest,
+              evaluator::SideEffect(NominalTypeDecl *, ImplicitMemberAction),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveMacroRequest,
+              ConcreteDeclRef(UnresolvedMacroReference, const Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveMacroConformances,
+              ArrayRef<Type>(const MacroRoleAttr *, const Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveTypeEraserTypeRequest,
+              Type(ProtocolDecl *, TypeEraserAttr *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PolymorphicEffectRequirementsRequest,
+              PolymorphicEffectRequirementList(EffectKind, ProtocolDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ConformanceHasEffectRequest,
+              bool(EffectKind, ProtocolConformanceRef),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveTypeRequest,
+              Type (const TypeResolution *, TypeRepr *, GenericParamList *),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveRawLayoutLikeTypeRequest,
+              Type(StructDecl *, RawLayoutAttr *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SPIGroupsRequest,
+              llvm::ArrayRef<Identifier>(Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SynthesizeMemberwiseInitRequest,
+              ConstructorDecl *(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveEffectiveMemberwiseInitRequest,
+              ConstructorDecl *(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasDefaultInitRequest,
+              bool(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SynthesizeDefaultInitRequest,
+              ConstructorDecl *(NominalTypeDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, TypeCheckSourceFileRequest,
+              bool(SouceFile *), SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ConformanceAccessScopeRequest,
+              ConformanceAccessScope(DeclContext *, ProtocolDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, TypeWitnessRequest,
+              TypeWitnessAndDecl(NormalProtocolConformance *,
+                                 AssociatedTypeDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, AssociatedConformanceRequest,
+              ProtocolConformanceRef(NormalProtocolConformance *,
+                                     Type, ProtocolDecl *, unsigned),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ReferencedAssociatedTypesRequest,
+              TinyPtrVector<AssociatedTypeDecl *>(ValueDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveTypeWitnessesRequest,
+              evaluator::SideEffect(NormalProtocolConformance *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ValueWitnessRequest,
+              Witness(NormalProtocolConformance *, ValueDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ResolveValueWitnessesRequest,
+              evaluator::SideEffect(NormalProtocolConformance *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PatternTypeRequest,
+              Type(ContextualPattern),
+              Cached, HasNearestLocation)
+NEXTCODE_REQUEST(TypeChecker, ScopedImportLookupRequest,
+              ArrayRef<ValueDecl *>(ImportDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ClosureHasResultExprRequest,
+              bool(ClosureExpr *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, LookupAllConformancesInContextRequest,
+              ProtocolConformanceLookupResult(const IterableDeclContext *),
+              Uncached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SimpleDidSetRequest, 
+              bool(AccessorDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SynthesizeMainFunctionRequest,
+              FuncDecl *(Decl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ImplicitKnownProtocolConformanceRequest,
+              ProtocolConformance *(NominalTypeDecl *, KnownProtocolKind),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, RenamedDeclRequest,
+              ValueDecl *(const ValueDecl *, const AvailableAttr *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SemanticAvailableRangeAttrRequest,
+              Optional<AvailableAttrDeclPair>(const Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SemanticUnavailableAttrRequest,
+              Optional<AvailableAttrDeclPair>(const Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ClosureEffectsRequest,
+              FunctionType::ExtInfo(ClosureExpr *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, GetSourceFileAsyncNode,
+              AwaitExpr *(const SourceFile *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, BreakTargetRequest,
+              LabeledStmt *(const BreakStmt *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ContinueTargetRequest,
+              LabeledStmt *(const ContinueStmt *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, PreCheckReturnStmtRequest,
+              Stmt *(ReturnStmt *, DeclContext *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsSingleValueStmtRequest,
+              IsSingleValueStmtResult(const Stmt *, ASTContext *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, MacroDefinitionRequest,
+              MacroDefinition(MacroDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, CompilerPluginLoadRequest,
+              CompilerPluginLoadResult(ASTContext *, Identifier),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExternalMacroDefinitionRequest,
+              ExternalMacroDefinition(ASTContext *, Identifier, Identifier),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandMacroExpansionDeclRequest,
+              ArrayRef<Decl *>(MacroExpansionDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandMacroExpansionExprRequest,
+              ArrayRef<Decl *>(MacroExpansionExpr *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandMemberAttributeMacros,
+              ArrayRef<unsigned>(Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandAccessorMacros,
+              ArrayRef<unsigned>(AbstractStorageDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandExtensionMacros,
+              ArrayRef<unsigned>(NominalTypeDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandSynthesizedMemberMacroRequest,
+              ArrayRef<unsigned>(Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandPeerMacroRequest,
+              ArrayRef<unsigned>(Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandPreambleMacroRequest,
+              ArrayRef<unsigned>(AbstractFunctionDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandBodyMacroRequest,
+              std::optional<unsigned>(AbstractFunctionDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, LocalDiscriminatorsRequest,
+              unsigned(DeclContext *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, RawCommentRequest,
+              RawComment(const Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SemanticBriefCommentRequest,
+              StringRef(const Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsNonUserModuleRequest,
+              bool(ModuleDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, TypeCheckObjCImplementationRequest,
+              unsigned(ExtensionDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, HasInitAccessorRequest,
+              bool(AbstractStorageDecl *), Cached,
+              NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, InitAccessorReferencedVariablesRequest,
+              ArrayRef<VarDecl *>(DeclAttribute *, AccessorDecl *,
+                                  ArrayRef<Identifier>),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ExpandChildTypeRefinementContextsRequest,
+              std::vector<TypeRefinementContext *>(TypeRefinementContext *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SerializeAttrGenericSignatureRequest,
+              GenericSignature(Decl *, SpecializeAttr *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsFunctionBodySkippedRequest,
+              bool(const AbstractFunctionDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, IsCCompatibleFuncDeclRequest,
+              bool(const FuncDecl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SemanticDeclAttrsRequest,
+              DeclAttributes(const Decl *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, UniqueUnderlyingTypeSubstitutionsRequest,
+              std::optional<SubstitutionMap>(const Decl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, LocalTypeDeclsRequest,
+              ArrayRef<TypeDecl *>(SourceFile *),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ObjCRequirementMapRequest,
+              ObjCRequirementMap(const ProtocolDecl *proto),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ImportDeclRequest,
+              std::optional<AttributedImport<ImportedModule>>(
+                  const SourceFile *sf, const ModuleDecl *mod),
+              Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, LifetimeDependenceInfoRequest,
+              LifetimeDependenceInfo(AbstractFunctionDecl *), Cached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, SuppressesConformanceRequest,
+              bool(NominalTypeDecl *decl, KnownProtocolKind kp),
+              SeparatelyCached, NoLocationInfo)
+
+NEXTCODE_REQUEST(TypeChecker, CaptureInfoRequest,
+              CaptureInfo(AbstractFunctionDecl *),
+              SeparatelyCached, NoLocationInfo)
+NEXTCODE_REQUEST(TypeChecker, ParamCaptureInfoRequest,
+              CaptureInfo(ParamDecl *),
+              SeparatelyCached, NoLocationInfo)
