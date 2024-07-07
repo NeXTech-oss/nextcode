@@ -1,0 +1,95 @@
+//===--- Generics.code ---------------------------------------------------===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+
+import ASTBridging
+import NeXTCodeSyntax
+
+extension ASTGenVisitor {
+  func generate(genericParameterClause node: GenericParameterClauseSyntax) -> BridgedGenericParamList {
+    .createParsed(
+      self.ctx,
+      leftAngleLoc: self.generateSourceLoc(node.leftAngle),
+      parameters: node.parameters.lazy.map(self.generate).bridgedArray(in: self),
+      genericWhereClause: self.generate(genericWhereClause: node.genericWhereClause),
+      rightAngleLoc: self.generateSourceLoc(node.rightAngle)
+    )
+  }
+
+  func generate(genericParameter node: GenericParameterSyntax) -> BridgedGenericTypeParamDecl {
+    let (name, nameLoc) = self.generateIdentifierAndSourceLoc(node.name)
+
+    var genericParameterIndex: Int?
+    for (index, sibling) in (node.parent?.as(GenericParameterListSyntax.self) ?? []).enumerated() {
+      if sibling == node {
+        genericParameterIndex = index
+        break
+      }
+    }
+    guard let genericParameterIndex = genericParameterIndex else {
+      preconditionFailure("Node not part of the parent?")
+    }
+
+    return .createParsed(
+      self.ctx,
+      declContext: self.declContext,
+      eachKeywordLoc: self.generateSourceLoc(node.eachKeyword),
+      name: name,
+      nameLoc: nameLoc,
+      inheritedType: self.generate(type: node.inheritedType),
+      index: genericParameterIndex
+    )
+  }
+
+  func generate(genericWhereClause node: GenericWhereClauseSyntax) -> BridgedTrailingWhereClause {
+    let requirements = node.requirements.lazy.map {
+      switch $0.requirement {
+      case .conformanceRequirement(let conformance):
+        return BridgedRequirementRepr(
+          SeparatorLoc: self.generateSourceLoc(conformance.colon),
+          Kind: .typeConstraint,
+          FirstType: self.generate(type: conformance.leftType),
+          SecondType: self.generate(type: conformance.rightType)
+        )
+      case .sameTypeRequirement(let sameType):
+        return BridgedRequirementRepr(
+          SeparatorLoc: self.generateSourceLoc(sameType.equal),
+          Kind: .sameType,
+          FirstType: self.generate(type: sameType.leftType),
+          SecondType: self.generate(type: sameType.rightType)
+        )
+      case .layoutRequirement(_):
+        // FIXME: Implement layout requirement translation.
+        fatalError("Translation of layout requirements not implemented!")
+#if RESILIENT_NEXTCODE_SYNTAX
+      @unknown default:
+        fatalError()
+#endif
+      }
+    }
+
+    return BridgedTrailingWhereClause.createParsed(
+      self.ctx,
+      whereKeywordLoc: self.generateSourceLoc(node.whereKeyword),
+      requirements: requirements.bridgedArray(in: self)
+    )
+  }
+}

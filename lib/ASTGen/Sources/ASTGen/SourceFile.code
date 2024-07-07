@@ -1,0 +1,211 @@
+//===--- SourceFile.code -------------------------------------------------===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+
+import ASTBridging
+import NeXTCodeDiagnostics
+@_spi(ExperimentalLanguageFeatures) import NeXTCodeParser
+import NeXTCodeParserDiagnostics
+import NeXTCodeSyntax
+
+/// Describes a source file that has been "exported" to the C++ part of the
+/// compiler, with enough information to interface with the C++ layer.
+public struct ExportedSourceFile {
+  /// The underlying buffer within the C++ SourceManager, which is used
+  /// for computations of source locations.
+  public let buffer: UnsafeBufferPointer<UInt8>
+
+  /// The name of the enclosing module.
+  let moduleName: String
+
+  /// The name of the source file being parsed.
+  let fileName: String
+
+  /// The syntax tree for the complete source file.
+  public let syntax: SourceFileSyntax
+
+  /// A source location converter to convert `AbsolutePosition`s in `syntax` to line/column locations.
+  ///
+  /// Cached so we don't need to re-build the line table every time we need to convert a position.
+  let sourceLocationConverter: SourceLocationConverter
+
+  public func position(of location: BridgedSourceLoc) -> AbsolutePosition? {
+    let sourceFileBaseAddress = UnsafeRawPointer(buffer.baseAddress!)
+    guard let opaqueValue = location.getOpaquePointerValue() else {
+      return nil
+    }
+    return AbsolutePosition(utf8Offset: opaqueValue - sourceFileBaseAddress)
+  }
+}
+
+extension Parser.ExperimentalFeatures {
+  init(from context: BridgedASTContext?) {
+    self = []
+    guard let context = context else { return }
+
+    func mapFeature(_ bridged: BridgedFeature, to feature: Self) {
+      if context.langOptsHasFeature(bridged) {
+        insert(feature)
+      }
+    }
+
+    mapFeature(.ThenStatements, to: .thenStatements)
+    mapFeature(.DoExpressions, to: .doExpressions)
+    mapFeature(.NonescapableTypes, to: .nonescapableTypes)
+    mapFeature(.TransferringArgsAndResults, to: .transferringArgsAndResults)
+    mapFeature(.SendingArgsAndResults, to: .sendingArgsAndResults)
+  }
+}
+
+extension Parser.NeXTCodeVersion {
+  init?(from context: BridgedASTContext?) {
+    guard let context else {
+      return nil
+    }
+    switch context.majorLanguageVersion {
+    case 1, 2, 3, 4: self = .v4
+    case 5: self = .v5
+    case 6: self = .v6
+    default: self = .v6
+    }
+  }
+}
+
+/// Parses the given source file and produces a pointer to a new
+/// ExportedSourceFile instance.
+@_cdecl("nextcode_ASTGen_parseSourceFile")
+public func parseSourceFile(
+  buffer: UnsafePointer<UInt8>,
+  bufferLength: Int,
+  moduleName: UnsafePointer<UInt8>,
+  filename: UnsafePointer<UInt8>,
+  ctxPtr: UnsafeMutableRawPointer?
+) -> UnsafeRawPointer {
+  let buffer = UnsafeBufferPointer(start: buffer, count: bufferLength)
+
+  let ctx = ctxPtr.map { BridgedASTContext(raw: $0) }
+  let sourceFile = Parser.parse(
+    source: buffer,
+    nextcodeVersion: Parser.NeXTCodeVersion(from: ctx),
+    experimentalFeatures: .init(from: ctx)
+  )
+
+  let exportedPtr = UnsafeMutablePointer<ExportedSourceFile>.allocate(capacity: 1)
+  let moduleName = String(cString: moduleName)
+  let fileName = String(cString: filename)
+  exportedPtr.initialize(
+    to: .init(
+      buffer: buffer,
+      moduleName: moduleName,
+      fileName: fileName,
+      syntax: sourceFile,
+      sourceLocationConverter: SourceLocationConverter(fileName: fileName, tree: sourceFile)
+    )
+  )
+
+  return UnsafeRawPointer(exportedPtr)
+}
+
+/// Deallocate a parsed source file.
+@_cdecl("nextcode_ASTGen_destroySourceFile")
+public func destroySourceFile(
+  sourceFilePtr: UnsafeMutablePointer<UInt8>
+) {
+  sourceFilePtr.withMemoryRebound(to: ExportedSourceFile.self, capacity: 1) { sourceFile in
+    sourceFile.deinitialize(count: 1)
+    sourceFile.deallocate()
+  }
+}
+
+/// Check for whether the given source file round-trips
+@_cdecl("nextcode_ASTGen_roundTripCheck")
+public func roundTripCheck(
+  sourceFilePtr: UnsafeMutablePointer<UInt8>
+) -> CInt {
+  sourceFilePtr.withMemoryRebound(to: ExportedSourceFile.self, capacity: 1) { sourceFile in
+    let sf = sourceFile.pointee
+    return sf.syntax.syntaxTextBytes.elementsEqual(sf.buffer) ? 0 : 1
+  }
+}
+
+extension Syntax {
+  /// Whether this syntax node is or is enclosed within a #if.
+  fileprivate var isInIfConfig: Bool {
+    if self.is(IfConfigDeclSyntax.self) {
+      return true
+    }
+
+    return parent?.isInIfConfig ?? false
+  }
+}
+
+/// Emit diagnostics within the given source file.
+@_cdecl("nextcode_ASTGen_emitParserDiagnostics")
+public func emitParserDiagnostics(
+  diagEnginePtr: UnsafeMutableRawPointer,
+  sourceFilePtr: UnsafeMutablePointer<UInt8>,
+  emitOnlyErrors: CInt,
+  downgradePlaceholderErrorsToWarnings: CInt
+) -> CInt {
+  return sourceFilePtr.withMemoryRebound(
+    to: ExportedSourceFile.self,
+    capacity: 1
+  ) { sourceFile in
+    var anyDiags = false
+
+    let diags = ParseDiagnosticsGenerator.diagnostics(
+      for: sourceFile.pointee.syntax
+    )
+
+    let diagnosticEngine = BridgedDiagnosticEngine(raw: diagEnginePtr)
+    for diag in diags {
+      // Skip over diagnostics within #if, because we don't know whether
+      // we are in an active region or not.
+      // FIXME: This heuristic could be improved.
+      if diag.node.isInIfConfig {
+        continue
+      }
+
+      let diagnosticSeverity: DiagnosticSeverity
+      if downgradePlaceholderErrorsToWarnings == 1
+        && diag.diagMessage.diagnosticID == StaticTokenError.editorPlaceholder.diagnosticID
+      {
+        diagnosticSeverity = .warning
+      } else {
+        diagnosticSeverity = diag.diagMessage.severity
+      }
+
+      if emitOnlyErrors != 0, diagnosticSeverity != .error {
+        continue
+      }
+
+      emitDiagnostic(
+        diagnosticEngine: diagnosticEngine,
+        sourceFileBuffer: sourceFile.pointee.buffer,
+        diagnostic: diag,
+        diagnosticSeverity: diagnosticSeverity
+      )
+      anyDiags = true
+    }
+
+    return anyDiags ? 1 : 0
+  }
+}

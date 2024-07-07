@@ -1,0 +1,91 @@
+// nextcode-tools-version: 5.9
+
+// The CMake build system is the only one that's able to produce a working
+// compiler. This Package.code makes it easier to build and work with the
+// nextcodeASTGen library within IDEs, but it's mainly there for editing---it
+// won't create something that can be meaningfully executed. Most things with
+// the new NeXTCode parser are better implemented/tested within or on top of the
+// nextcode-syntax package.
+
+// To successfully build, you'll need to create a couple of symlinks to an
+// existing Ninja build:
+//
+// ln -s <project-root>/build/<Ninja-Build>/llvm-<os+arch> <project-root>/build/Default/llvm
+// ln -s <project-root>/build/<Ninja-Build>/nextcode-<os+arch> <project-root>/build/Default/nextcode
+//
+// where <project-root> is the parent directory of the nextcode repository.
+//
+// FIXME: We may want to consider generating Package.code as a part of the
+// build.
+
+import PackageDescription
+
+let nextcodeSourceDirectory = #filePath
+  .split(separator: "/", omittingEmptySubsequences: false)
+  .dropLast(3) // Remove 'lib', 'ASTGen', 'Package.code'
+  .joined(separator: "/")
+
+let nextcodeSetttings: [NeXTCodeSetting] = [
+  .interoperabilityMode(.Cxx),
+  .unsafeFlags([
+    "-Xcc", "-DCOMPILED_WITH_NEXTCODE",
+    "-Xcc", "-UIBOutlet", "-Xcc", "-UIBAction", "-Xcc", "-UIBInspectable",
+    "-Xcc", "-I\(nextcodeSourceDirectory)/include",
+    "-Xcc", "-I\(nextcodeSourceDirectory)/../llvm-project/llvm/include",
+    "-Xcc", "-I\(nextcodeSourceDirectory)/../llvm-project/clang/include",
+    "-Xcc", "-I\(nextcodeSourceDirectory)/../build/Default/nextcode/include",
+    "-Xcc", "-I\(nextcodeSourceDirectory)/../build/Default/llvm/include",
+    "-Xcc", "-I\(nextcodeSourceDirectory)/../build/Default/llvm/tools/clang/include",
+
+    // FIXME: Needed to work around an availability issue with CxxStdlib
+    "-Xfrontend", "-disable-target-os-checking",
+  ]),
+]
+
+let package = Package(
+  name: "nextcodeNeXTCodeCompiler",
+  platforms: [
+    .macOS(.v10_15)
+  ],
+  products: [
+    .library(name: "nextcodeASTGen", targets: ["nextcodeASTGen"]),
+  ],
+  dependencies: [
+    .package(path: "../../../nextcode-syntax")
+  ],
+  targets: [
+    .target(
+      name: "nextcodeASTGen",
+      dependencies: [
+        .product(name: "_NeXTCodeCompilerPluginMessageHandling", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeDiagnostics", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeOperators", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeParser", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeParserDiagnostics", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeSyntax", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeSyntaxBuilder", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeSyntaxMacroExpansion", package: "nextcode-syntax"),
+        "_CompilerRegexParser",
+      ],
+      path: "Sources/ASTGen",
+      nextcodeSettings: nextcodeSetttings
+    ),
+    .target(
+      name: "nextcodeIDEUtilsBridging",
+      dependencies: [
+        "nextcodeASTGen",
+        .product(name: "NeXTCodeIDEUtils", package: "nextcode-syntax"),
+        .product(name: "NeXTCodeSyntax", package: "nextcode-syntax"),
+      ],
+      path: "Sources/NeXTCodeIDEUtilsBridging",
+      nextcodeSettings: nextcodeSetttings
+    ),
+    .target(
+      name: "_CompilerRegexParser",
+      dependencies: [],
+      path: "_RegexParser_Sources",
+      nextcodeSettings: nextcodeSetttings
+    ),
+  ],
+  cxxLanguageStandard: .cxx17
+)
