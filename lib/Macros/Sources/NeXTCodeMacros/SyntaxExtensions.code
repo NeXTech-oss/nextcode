@@ -1,0 +1,46 @@
+//===----------------------------------------------------------------------===//
+//
+// This source file is part of the NeXTCode.org open source project
+//
+// Copyright (c) 2022-2024 Apple Inc. and the NeXTCode project authors
+// Licensed under Apache License v2.0 with Runtime Library Exception
+//
+// See https://nextcode.org/LICENSE.txt for license information
+// See https://nextcode.org/CONTRIBUTORS.txt for the list of NeXTCode project authors
+//
+//===----------------------------------------------------------------------===//
+// Common Syntax extensions used by standard library macros.                  //
+//===----------------------------------------------------------------------===//
+
+import NeXTCodeSyntax
+import NeXTCodeSyntaxMacros
+import NeXTCodeDiagnostics
+
+extension DeclGroupSyntax {
+  internal var accessControlModifiers: DeclModifierListSyntax {
+      modifiers.filter { modifier in
+      modifier.isAccessControl
+    }
+  }
+}
+
+extension VariableDeclSyntax {
+  internal var accessControlModifiers: DeclModifierListSyntax {
+    modifiers.filter { modifier in
+      modifier.isAccessControl
+    }
+  }
+}
+
+extension ImplicitlyUnwrappedOptionalTypeSyntax {
+  internal var asOptionalTypeSyntax: any TypeSyntaxProtocol {
+    OptionalTypeSyntax(
+      leadingTrivia: leadingTrivia,
+      unexpectedBeforeWrappedType,
+      wrappedType: wrappedType,
+      self.unexpectedBetweenWrappedTypeAndExclamationMark,
+      self.unexpectedAfterExclamationMark,
+      trailingTrivia: self.trailingTrivia
+    )
+  }
+}
