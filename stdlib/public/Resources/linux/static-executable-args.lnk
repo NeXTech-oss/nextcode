@@ -1,0 +1,17 @@
+-static
+-lnextcodeCore
+-Xlinker
+-undefined=pthread_self
+-Xlinker
+-undefined=pthread_once
+-Xlinker
+-undefined=pthread_key_create
+-ldispatch
+-lBlocksRuntime
+-lpthread
+-licui18nnextcode
+-licuucnextcode
+-licudatanextcode
+-ldl
+-lstdc++
+-lm
