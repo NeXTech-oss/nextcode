@@ -1,4 +1,0 @@
-PKG_BRANCH = master
-PKG_SHA1 = ed7a8dca87fa58d80053abf68fb7dfefa54d554e
-PKG_GIT_URL := https://github.com/nextech-oss/Warehouse.git
-PKG_TAR_URL = https://api.github.com/repos/nextech-oss/Warehouse/tarball/$1
