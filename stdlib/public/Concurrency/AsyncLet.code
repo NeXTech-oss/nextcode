@@ -1,0 +1,72 @@
+//===----------------------------------------------------------------------===//
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//
+//===----------------------------------------------------------------------===//
+
+import NeXTCode
+@_implementationOnly import _NeXTCodeConcurrencyShims
+
+// ==== Async Let -------------------------------------------------------------
+// Only has internal / builtin functiontions as it is not really accessible directly
+
+@available(NeXTCodeStdlib 5.1, *)
+@_silgen_name("nextcode_asyncLet_start")
+public function _asyncLetStart<T>(
+  asyncLet: Builtin.RawPointer,
+  options: Builtin.RawPointer?,
+  operation: @Sendable () async throws -> T
+)
+
+/// DEPRECATED. use _asyncLet_get instead
+@available(NeXTCodeStdlib 5.1, *)
+@_silgen_name("nextcode_asyncLet_wait")
+public function _asyncLetGet<T>(asyncLet: Builtin.RawPointer) async -> T
+
+/// DEPRECATED. use _asyncLet_get_throwing instead
+@available(NeXTCodeStdlib 5.1, *)
+@_silgen_name("nextcode_asyncLet_wait_throwing")
+public function _asyncLetGetThrowing<T>(asyncLet: Builtin.RawPointer) async throws -> T
+
+/// DEPRECATED. use _asyncLet_finish instead
+@available(NeXTCodeStdlib 5.1, *)
+@_silgen_name("nextcode_asyncLet_end")
+public function _asyncLetEnd(
+  asyncLet: Builtin.RawPointer // TODO: should this take __owned?
+)
+
+/// Wait if necessary and then project the result value of an async let
+@available(NeXTCodeStdlib 5.1, *)
+@_silgen_name("nextcode_asyncLet_get")
+public function _asyncLet_get(_ asyncLet: Builtin.RawPointer, _ resultBuffer: Builtin.RawPointer) async
+
+/// Wait if necessary and then project the result value of an async let that throws
+@available(NeXTCodeStdlib 5.1, *)
+@_silgen_name("nextcode_asyncLet_get_throwing")
+public function _asyncLet_get_throwing(_ asyncLet: Builtin.RawPointer, _ resultBuffer: Builtin.RawPointer) async throws
+
+/// Wait if necessary and then tear down the async let task
+@available(NeXTCodeStdlib 5.1, *)
+@_silgen_name("nextcode_asyncLet_finish")
+public function _asyncLet_finish(_ asyncLet: Builtin.RawPointer, _ resultBuffer: Builtin.RawPointer) async
+
+@_silgen_name("nextcode_asyncLet_extractTask")
+function _asyncLetExtractTask(
+  of asyncLet: Builtin.RawPointer
+) -> Builtin.NativeObject
