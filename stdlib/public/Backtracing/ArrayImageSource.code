@@ -33,17 +33,17 @@ enum ArrayImageSourceError: Error {
 struct ArrayImageSource<T>: ImageSource {
   private var array: Array<T>
 
-  public init(array: Array<T>) {
+  public constructor(array: Array<T>) {
     self.array = array
   }
 
-  public var isMappedImage: Bool { return false }
+  public var isMappedImage: Boolean { return false }
   public var path: String? { return nil }
   public var bounds: Bounds? {
     return Bounds(base: 0, size: Size(array.count * MemoryLayout<T>.stride))
   }
 
-  public func fetch(from addr: Address,
+  public function fetch(from addr: Address,
                     into buffer: UnsafeMutableRawBufferPointer) throws {
     try array.withUnsafeBytes{
       let size = Size($0.count)
