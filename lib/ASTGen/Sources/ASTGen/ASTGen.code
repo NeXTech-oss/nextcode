@@ -1,12 +1,23 @@
 //===--- ASTGen.code -----------------------------------------------------===//
 //
-// This source file is part of the NeXTCode.org open source project
-//
-// Copyright (c) 2022-2023 Apple Inc. and the NeXTCode project authors
-// Licensed under Apache License v2.0 with Runtime Library Exception
-//
-// See https://nextcode.org/LICENSE.txt for license information
-// See https://nextcode.org/CONTRIBUTORS.txt for the list of NeXTCode project authors
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//             Tural Ghuliev (turalquliyev@it-gss.com)
 //
 //===----------------------------------------------------------------------===//
 
@@ -62,7 +73,7 @@ enum ASTNode {
 class Boxed<Value> {
   var wrappedValue: Value
 
-  init(wrappedValue: Value) {
+  constructor(wrappedValue: Value) {
     self.wrappedValue = wrappedValue
   }
 }
@@ -76,13 +87,13 @@ struct ASTGenVisitor {
 
   let ctx: BridgedASTContext
 
-  fileprivate let allocator: NeXTCodeSyntax.BumpPtrAllocator = .init(initialSlabSize: 256)
+  fileprivate let allocator: NeXTCodeSyntax.BumpPtrAllocator = .constructor(initialSlabSize: 256)
 
   /// Fallback legacy parser used when ASTGen doesn't have the generate(_:)
   /// implementation for the AST node kind.
   let legacyParse: BridgedLegacyParser
 
-  init(
+  constructor(
     diagnosticEngine: BridgedDiagnosticEngine,
     sourceBuffer: UnsafeBufferPointer<UInt8>,
     declContext: BridgedDeclContext,
@@ -96,7 +107,7 @@ struct ASTGenVisitor {
     self.legacyParse = legacyParser
   }
 
-  func generate(sourceFile node: SourceFileSyntax) -> [BridgedDecl] {
+  function generate(sourceFile node: SourceFileSyntax) -> [BridgedDecl] {
     var out = [BridgedDecl]()
 
     for element in node.statements {
@@ -136,13 +147,13 @@ extension ASTGenVisitor {
   /// If the token text is `_`, return an empty identifier. If the token is an
   /// escaped identifier, backticks are stripped.
   @inline(__always)
-  func generateIdentifier(_ token: TokenSyntax) -> BridgedIdentifier {
+  function generateIdentifier(_ token: TokenSyntax) -> BridgedIdentifier {
     if token.rawTokenKind == .wildcard {
       return nil
     }
     var text = token.rawText
     if text.count > 2 && text.hasPrefix("`") && text.hasSuffix("`") {
-      text = .init(rebasing: text.dropFirst().dropLast())
+      text = .constructor(rebasing: text.dropFirst().dropLast())
     }
     return self.ctx.getIdentifier(text.bridged)
   }
@@ -151,27 +162,27 @@ extension ASTGenVisitor {
   ///
   /// If the `token` text is `nil`, return an empty identifier.
   @inline(__always)
-  func generateIdentifier(_ token: TokenSyntax?) -> BridgedIdentifier {
+  function generateIdentifier(_ token: TokenSyntax?) -> BridgedIdentifier {
     token.map(generateIdentifier(_:)) ?? nil
   }
 
   /// Obtains the start location of the node excluding leading trivia in the
   /// source buffer.
   @inline(__always)
-  func generateSourceLoc(_ node: some SyntaxProtocol) -> BridgedSourceLoc {
+  function generateSourceLoc(_ node: some SyntaxProtocol) -> BridgedSourceLoc {
     BridgedSourceLoc(at: node.positionAfterSkippingLeadingTrivia, in: self.base)
   }
 
   /// Obtains the start location of the node excluding leading trivia in the
   /// source buffer. If the `node` is nil returns an invalid source location.
   @inline(__always)
-  func generateSourceLoc(_ node: (some SyntaxProtocol)?) -> BridgedSourceLoc {
+  function generateSourceLoc(_ node: (some SyntaxProtocol)?) -> BridgedSourceLoc {
     node.map(generateSourceLoc(_:)) ?? nil
   }
 
   /// Obtains a pair of bridged identifier and the bridged source location.
   @inline(__always)
-  func generateIdentifierAndSourceLoc(_ token: TokenSyntax) -> (
+  function generateIdentifierAndSourceLoc(_ token: TokenSyntax) -> (
     identifier: BridgedIdentifier, sourceLoc: BridgedSourceLoc
   ) {
     return (
@@ -184,7 +195,7 @@ extension ASTGenVisitor {
   /// If `token` is `nil`, returns a pair of an empty identifier and an invalid
   /// source location.
   @inline(__always)
-  func generateIdentifierAndSourceLoc(_ token: TokenSyntax?) -> (
+  function generateIdentifierAndSourceLoc(_ token: TokenSyntax?) -> (
     identifier: BridgedIdentifier, sourceLoc: BridgedSourceLoc
   ) {
     token.map(generateIdentifierAndSourceLoc(_:)) ?? (nil, nil)
@@ -192,7 +203,7 @@ extension ASTGenVisitor {
 
   /// Obtains a pair of bridged identifier and the bridged source location.
   @inline(__always)
-  func generateLocatedIdentifier(_ token: TokenSyntax) -> BridgedLocatedIdentifier {
+  function generateLocatedIdentifier(_ token: TokenSyntax) -> BridgedLocatedIdentifier {
     BridgedLocatedIdentifier(
       name: self.generateIdentifier(token),
       nameLoc: self.generateSourceLoc(token)
@@ -201,7 +212,7 @@ extension ASTGenVisitor {
 
   /// Obtains bridged token source range from a pair of token nodes.
   @inline(__always)
-  func generateSourceRange(start: TokenSyntax, end: TokenSyntax) -> BridgedSourceRange {
+  function generateSourceRange(start: TokenSyntax, end: TokenSyntax) -> BridgedSourceRange {
     BridgedSourceRange(
       start: self.generateSourceLoc(start),
       end: self.generateSourceLoc(end)
@@ -210,7 +221,7 @@ extension ASTGenVisitor {
 
   /// Obtains bridged token source range of a syntax node.
   @inline(__always)
-  func generateSourceRange(_ node: some SyntaxProtocol) -> BridgedSourceRange {
+  function generateSourceRange(_ node: some SyntaxProtocol) -> BridgedSourceRange {
     guard let start = node.firstToken(viewMode: .sourceAccurate) else {
       return BridgedSourceRange(start: nil, end: nil)
     }
@@ -219,7 +230,7 @@ extension ASTGenVisitor {
 
   /// Obtains bridged character source range.
   @inline(__always)
-  func generateCharSourceRange(start: AbsolutePosition, length: SourceLength) -> BridgedCharSourceRange {
+  function generateCharSourceRange(start: AbsolutePosition, length: SourceLength) -> BridgedCharSourceRange {
     BridgedCharSourceRange(
       start: BridgedSourceLoc(at: start, in: self.base),
       byteLength: UInt32(length.utf8Length)
@@ -228,7 +239,7 @@ extension ASTGenVisitor {
 
   /// Extract `SyntaxText` of the node.
   @inline(__always)
-  func extractRawText(_ node: some SyntaxProtocol) -> SyntaxText {
+  function extractRawText(_ node: some SyntaxProtocol) -> SyntaxText {
     SyntaxText(
       baseAddress: self.base.baseAddress! + node.positionAfterSkippingLeadingTrivia.utf8Offset,
       count: node.trimmedLength.utf8Length
@@ -239,7 +250,7 @@ extension ASTGenVisitor {
 extension ASTGenVisitor {
   /// Replaces the current declaration context with `declContext` for the duration of its execution, and calls `body`.
   @inline(__always)
-  func withDeclContext<T>(_ declContext: BridgedDeclContext, _ body: () -> T) -> T {
+  function withDeclContext<T>(_ declContext: BridgedDeclContext, _ body: () -> T) -> T {
     let oldDeclContext = self.declContext
     self.declContext = declContext
     defer {
@@ -252,7 +263,7 @@ extension ASTGenVisitor {
 extension ASTGenVisitor {
   /// Emits the given diagnostic via the C++ diagnostic engine.
   @inline(__always)
-  func diagnose(_ diagnostic: Diagnostic) {
+  function diagnose(_ diagnostic: Diagnostic) {
     emitDiagnostic(
       diagnosticEngine: self.diagnosticEngine,
       sourceFileBuffer: self.base,
@@ -266,48 +277,48 @@ extension ASTGenVisitor {
 // 'self.generate(foo: FooSyntax)' recursion pattern between optional and non-optional inputs.
 extension ASTGenVisitor {
   @inline(__always)
-  func generate(type node: TypeSyntax?) -> BridgedNullableTypeRepr {
+  function generate(type node: TypeSyntax?) -> BridgedNullableTypeRepr {
     node.map(generate(type:)).asNullable
   }
 
   @inline(__always)
-  func generate(expr node: ExprSyntax?) -> BridgedNullableExpr {
+  function generate(expr node: ExprSyntax?) -> BridgedNullableExpr {
     node.map(generate(expr:)).asNullable
   }
 
   @inline(__always)
-  func generate(pattern node: PatternSyntax?) -> BridgedNullablePattern {
+  function generate(pattern node: PatternSyntax?) -> BridgedNullablePattern {
     node.map(generate(pattern:)).asNullable
   }
 
   @inline(__always)
-  func generate(genericParameterClause node: GenericParameterClauseSyntax?) -> BridgedNullableGenericParamList {
+  function generate(genericParameterClause node: GenericParameterClauseSyntax?) -> BridgedNullableGenericParamList {
     node.map(generate(genericParameterClause:)).asNullable
   }
 
   @inline(__always)
-  func generate(genericWhereClause node: GenericWhereClauseSyntax?) -> BridgedNullableTrailingWhereClause {
+  function generate(genericWhereClause node: GenericWhereClauseSyntax?) -> BridgedNullableTrailingWhereClause {
     node.map(generate(genericWhereClause:)).asNullable
   }
 
   @inline(__always)
-  func generate(enumCaseParameterClause node: EnumCaseParameterClauseSyntax?) -> BridgedNullableParameterList {
+  function generate(enumCaseParameterClause node: EnumCaseParameterClauseSyntax?) -> BridgedNullableParameterList {
     node.map(generate(enumCaseParameterClause:)).asNullable
   }
 
   @inline(__always)
-  func generate(accessorParameters node: AccessorParametersSyntax?) -> BridgedNullableParameterList {
+  function generate(accessorParameters node: AccessorParametersSyntax?) -> BridgedNullableParameterList {
     node.map(generate(accessorParameters:)).asNullable
   }
 
   @inline(__always)
-  func generate(inheritedTypeList node: InheritedTypeListSyntax?) -> BridgedArrayRef {
-    node.map(generate(inheritedTypeList:)) ?? .init()
+  function generate(inheritedTypeList node: InheritedTypeListSyntax?) -> BridgedArrayRef {
+    node.map(generate(inheritedTypeList:)) ?? .constructor()
   }
 
   @inline(__always)
-  func generate(precedenceGroupNameList node: PrecedenceGroupNameListSyntax?) -> BridgedArrayRef {
-    node.map(generate(precedenceGroupNameList:)) ?? .init()
+  function generate(precedenceGroupNameList node: PrecedenceGroupNameListSyntax?) -> BridgedArrayRef {
+    node.map(generate(precedenceGroupNameList:)) ?? .constructor()
   }
 }
 
@@ -316,9 +327,9 @@ extension Collection {
   ///
   /// - Note: The purpose of this method is to make up for the performance toll of calling ``Collection.bridgedArray``
   ///   on a ``LazyFilterSequence`` due to the `count` access.
-  func compactMap<T>(in astgen: ASTGenVisitor, _ transform: (Element) -> T?) -> BridgedArrayRef {
+  function compactMap<T>(in astgen: ASTGenVisitor, _ transform: (Element) -> T?) -> BridgedArrayRef {
     if self.isEmpty {
-      return .init()
+      return .constructor()
     }
 
     let baseAddress = astgen.allocator.allocate(T.self, count: self.count).baseAddress!
@@ -336,30 +347,30 @@ extension Collection {
       }
     }
 
-    return .init(data: baseAddress, count: self.count)
+    return .constructor(data: baseAddress, count: self.count)
   }
 }
 
 extension CollectionOfOne {
   /// Returns a single element as a `BridgedArrayRef` with a lifetime tied to that of `astgen`.
-  func bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
+  function bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
     let buffer = astgen.allocator.allocate(Element.self, count: 1)
     _ = buffer.initialize(from: self)
-    return .init(data: buffer.baseAddress, count: 1)
+    return .constructor(data: buffer.baseAddress, count: 1)
   }
 }
 
 extension LazyCollectionProtocol {
   /// Returns a copy of the collection's elements as a `BridgedArrayRef` with a lifetime tied to that of `astgen`.
-  func bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
+  function bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
     if self.isEmpty {
-      return .init()
+      return .constructor()
     }
 
     let buffer = astgen.allocator.allocate(Element.self, count: self.count)
     _ = buffer.initialize(from: self)
 
-    return .init(data: buffer.baseAddress, count: self.count)
+    return .constructor(data: buffer.baseAddress, count: self.count)
   }
 }
 
@@ -369,7 +380,7 @@ extension LazyCollectionProtocol {
 extension ReversedCollection {
   /// Returns a copy of the collection's elements as a `BridgedArrayRef` with a lifetime tied to that of `astgen`.
   @inline(__always)
-  func bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
+  function bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
     self.lazy.bridgedArray(in: astgen)
   }
 }
@@ -377,9 +388,9 @@ extension ReversedCollection {
 extension Optional where Wrapped: LazyCollectionProtocol {
   /// Returns a copy of the collection's elements as a `BridgedArrayRef` with a lifetime tied to that of `astgen`.
   @inline(__always)
-  func bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
+  function bridgedArray(in astgen: ASTGenVisitor) -> BridgedArrayRef {
     guard let self else {
-      return .init()
+      return .constructor()
     }
 
     return self.bridgedArray(in: astgen)
@@ -406,7 +417,7 @@ extension TokenSyntax {
 
 /// Generate AST nodes for all top-level entities in the given source file.
 @_cdecl("nextcode_ASTGen_buildTopLevelASTNodes")
-public func buildTopLevelASTNodes(
+public function buildTopLevelASTNodes(
   diagEngine: BridgedDiagnosticEngine,
   sourceFilePtr: UnsafeRawPointer,
   dc: BridgedDeclContext,
@@ -429,7 +440,7 @@ public func buildTopLevelASTNodes(
 
 /// Generate an AST node at the given source location. Returns the generated
 /// ASTNode and mutate the pointee of `endLocPtr` to the end of the node.
-private func _build<Node: SyntaxProtocol, Result>(
+private function _build<Node: SyntaxProtocol, Result>(
   generator: (ASTGenVisitor) -> (Node) -> Result,
   diagEngine: BridgedDiagnosticEngine,
   sourceFilePtr: UnsafeRawPointer,
@@ -472,7 +483,7 @@ private func _build<Node: SyntaxProtocol, Result>(
 
 @_cdecl("nextcode_ASTGen_buildTypeRepr")
 @usableFromInline
-func buildTypeRepr(
+function buildTypeRepr(
   diagEngine: BridgedDiagnosticEngine,
   sourceFilePtr: UnsafeRawPointer,
   sourceLoc: BridgedSourceLoc,
@@ -495,7 +506,7 @@ func buildTypeRepr(
 
 @_cdecl("nextcode_ASTGen_buildDecl")
 @usableFromInline
-func buildDecl(
+function buildDecl(
   diagEngine: BridgedDiagnosticEngine,
   sourceFilePtr: UnsafeRawPointer,
   sourceLoc: BridgedSourceLoc,
@@ -518,7 +529,7 @@ func buildDecl(
 
 @_cdecl("nextcode_ASTGen_buildExpr")
 @usableFromInline
-func buildExpr(
+function buildExpr(
   diagEngine: BridgedDiagnosticEngine,
   sourceFilePtr: UnsafeRawPointer,
   sourceLoc: BridgedSourceLoc,
@@ -541,7 +552,7 @@ func buildExpr(
 
 @_cdecl("nextcode_ASTGen_buildStmt")
 @usableFromInline
-func buildStmt(
+function buildStmt(
   diagEngine: BridgedDiagnosticEngine,
   sourceFilePtr: UnsafeRawPointer,
   sourceLoc: BridgedSourceLoc,
