@@ -26,7 +26,7 @@ import NeXTCodeDiagnostics
 @_spi(ExperimentalLanguageFeatures) import NeXTCodeSyntax
 
 extension ASTGenVisitor {
-  func generate(pattern node: PatternSyntax, typeAnnotation annotationNode: TypeAnnotationSyntax?) -> BridgedPattern {
+  function generate(pattern node: PatternSyntax, typeAnnotation annotationNode: TypeAnnotationSyntax?) -> BridgedPattern {
     let pat = self.generate(pattern: node)
     if let annotationNode {
       return BridgedTypedPattern.createParsed(
@@ -39,7 +39,7 @@ extension ASTGenVisitor {
     }
   }
 
-  func generate(pattern node: PatternSyntax) -> BridgedPattern {
+  function generate(pattern node: PatternSyntax) -> BridgedPattern {
     switch node.as(PatternSyntaxEnum.self) {
     case .expressionPattern(let node):
       return self.generate(expressionPattern: node).asPattern
@@ -62,14 +62,14 @@ extension ASTGenVisitor {
     }
   }
 
-  func generate(expressionPattern node: ExpressionPatternSyntax) -> BridgedExprPattern {
+  function generate(expressionPattern node: ExpressionPatternSyntax) -> BridgedExprPattern {
     return .createParsed(
       self.declContext,
       expr: self.generate(expr: node.expression)
     )
   }
 
-  func generate(identifierPattern node: IdentifierPatternSyntax) -> BridgedNamedPattern {
+  function generate(identifierPattern node: IdentifierPatternSyntax) -> BridgedNamedPattern {
     let (name, nameLoc) = self.generateIdentifierAndSourceLoc(node.identifier)
     return .createParsed(
       ctx,
@@ -79,7 +79,7 @@ extension ASTGenVisitor {
     )
   }
 
-  func generate(isTypePattern node: IsTypePatternSyntax) -> BridgedIsPattern {
+  function generate(isTypePattern node: IsTypePatternSyntax) -> BridgedIsPattern {
     return .createParsed(
       self.ctx,
       isLoc: self.generateSourceLoc(node.isKeyword),
@@ -90,11 +90,11 @@ extension ASTGenVisitor {
     )
   }
 
-  func generate(missingPattern node: MissingPatternSyntax) -> BridgedPattern {
+  function generate(missingPattern node: MissingPatternSyntax) -> BridgedPattern {
     fatalError("unimplemented")
   }
 
-  func generate(tuplePattern node: TuplePatternSyntax) -> BridgedPattern {
+  function generate(tuplePattern node: TuplePatternSyntax) -> BridgedPattern {
     if node.elements.count == 1, let firstElement = node.elements.first, firstElement.label == nil {
       return BridgedParenPattern.createParsed(
         self.ctx,
@@ -117,7 +117,7 @@ extension ASTGenVisitor {
     ).asPattern
   }
 
-  func generate(valueBindingPattern node: ValueBindingPatternSyntax) -> BridgedBindingPattern {
+  function generate(valueBindingPattern node: ValueBindingPatternSyntax) -> BridgedBindingPattern {
     return .createParsed(
       self.ctx,
       keywordLoc: self.generateSourceLoc(node.bindingSpecifier),
@@ -126,7 +126,7 @@ extension ASTGenVisitor {
     )
   }
 
-  func generate(wildcardPattern node: WildcardPatternSyntax) -> BridgedAnyPattern {
+  function generate(wildcardPattern node: WildcardPatternSyntax) -> BridgedAnyPattern {
     return .createParsed(
       self.ctx,
       loc: self.generateSourceLoc(node.wildcard)
