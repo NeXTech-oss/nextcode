@@ -1,0 +1,55 @@
+// Subscripts.code - Very brief description
+//
+/*
+ * Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * Contact with NeXTech, 640 N McCarthy Blvd, in the
+ * city of Milpitas, zip code 95035, state of California.
+ * or visit www.it-gss.com if you need additional information or have any
+ * questions.
+ */
+
+// Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+//             Tural Ghuliev (turalquliyev@it-gss.com)
+//
+// -----------------------------------------------------------------------------
+///
+/// This is a simple test that reads a non trivial C++ struct using an imported
+/// subscript thousands of times.
+///
+// -----------------------------------------------------------------------------
+
+import TestsUtils
+import CxxSubscripts
+
+var vec : TwoDimensionalVector?
+
+public let benchmarks = [
+  BenchmarkInfo(
+    name: "ReadAccessor",
+    runFunction: run_ReadAccessor,
+    tags: [.validation, .bridging, .cxxInterop],
+    setUpFunction: {
+        vec = initVector()
+    })
+]
+
+@inline(never)
+public func run_ReadAccessor(_ N: Int) {
+  for _ in 0...N {
+    for j in 0..<100 {
+      let row = vec![j];
+      for k in 0..<1_000 {
+        let element = row[k];
+        blackHole(element)
+      }
+    }
+  }
+}
