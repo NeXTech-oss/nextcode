@@ -2,30 +2,31 @@
 NeXTCode is an innovative programming language that combines the efficiency and speed of Mojo with the elegance and practicality of Python and TypeScript. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
 
 ```
-import Foundation
+import 'nextcode:math';
 
-struct Circle {
-    var radius: Double
-    let pi: Double = 3.14
+class Circle {
+  double radius;
+  static const double pi = 3.14;
+
+  Circle(this.radius);
 }
 
-function printTotalArea(circles: inout [Circle]) {
-    var totalArea: Double = 0.0
-    for circle in circles {
-        totalArea += circle.pi * pow(circle.radius, 2.0)
-    }
-    print("Total area: \(totalArea)")
+function printTotalArea(List<Circle> circles) {
+  double totalArea = 0.0;
+  for (var circle in circles) {
+    totalArea += Circle.pi * pow(circle.radius, 2);
+  }
+  print('Total area: $totalArea');
 }
 
 function main() {
-    var circles: [Circle] = [
-        Circle(radius: 1.0),
-        Circle(radius: 2.0)
-    ]
-    printTotalArea(circles: &circles)
+  List<Circle> circles = [
+    Circle(1.0),
+    Circle(2.0)
+  ];
+  printTotalArea(circles);
 }
 
-main()
 ```
 
 ## Killer Features of the Language
