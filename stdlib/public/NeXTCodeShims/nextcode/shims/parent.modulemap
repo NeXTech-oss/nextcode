@@ -1,3 +1,0 @@
-extern module NeXTCodeShims             "shims/module.modulemap"
-extern module _NeXTCodeConcurrencyShims "shims/module.modulemap"
-extern module NeXTCodeOverlayShims      "shims/module.modulemap"
