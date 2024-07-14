@@ -1,5 +1,5 @@
 # Welcome to NeXTCode Programming Language !
-NeXTCode is an innovative programming language that combines the efficiency and speed of Mojo with the elegance and practicality of Python and TypeScript. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
+NeXTCode is an innovative programming language that combines the efficiency and speed of Mojo with the elegance and practicality of TypeScript. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
 
 ```
 import 'nextcode:math';
