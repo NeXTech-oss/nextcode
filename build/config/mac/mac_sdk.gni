@@ -1,0 +1,50 @@
+# Copyright 2014 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/toolchain/rbe.gni")
+
+declare_args() {
+  # Minimum supported version of the Mac SDK.
+  #
+  # TODO: When the minimum supported SDK version is incremented to "10.15",
+  # remove the usage of `SecTrustEvaluate` from
+  # runtime/bin/security_context_macos.cc
+  mac_sdk_min = "10.14"
+
+  # Path to a specific version of the Mac SDK, not including a backslash at
+  # the end. If empty, the path to the lowest version greater than or equal to
+  # mac_sdk_min is used.
+  mac_sdk_path = ""
+
+  mac_enable_relative_sdk_path = use_rbe
+}
+
+find_sdk_args = [
+  "--print_sdk_path",
+  mac_sdk_min,
+]
+
+if (use_rbe) {
+  find_sdk_args += [
+    "--create_symlink_at",
+
+    # $root_build_dir starts with "//", which is removed by rebase_path().
+    rebase_path("$root_build_dir/sdk/xcode_links", "//"),
+  ]
+}
+
+# The tool will print the SDK path on the first line, and the version on the
+# second line.
+find_sdk_lines =
+    exec_script("//build/mac/find_sdk.py", find_sdk_args, "list lines")
+mac_sdk_version = find_sdk_lines[1]
+if (mac_sdk_path == "") {
+  # TODO(brettw) http://crbug.com/335325  when everybody moves to XCode 5 we
+  # can remove the --print_sdk_path argument to find_sdk and instead just use
+  # the following two lines to get the path. Although it looks longer here, it
+  # saves forking a process in find_sdk.py so will be faster.
+  #mac_sdk_root = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX"
+  #mac_sdk_path = mac_sdk_root + mac_sdk_version + ".sdk"
+  mac_sdk_path = find_sdk_lines[0]
+}
