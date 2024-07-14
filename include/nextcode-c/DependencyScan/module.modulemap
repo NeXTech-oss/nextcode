@@ -1,4 +1,0 @@
-module _InternalNeXTCodeScan {
-  header "DependencyScan.h"
-  link "_InternalNeXTCodeScan"
-}
