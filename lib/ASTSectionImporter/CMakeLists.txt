@@ -1,9 +1,0 @@
-
-
-add_nextcode_host_library(nextcodeASTSectionImporter STATIC
-  ASTSectionImporter.cpp
-  LLVM_LINK_COMPONENTS core)
-target_link_libraries(nextcodeASTSectionImporter PRIVATE
-  nextcodeBasic)
-
-set_nextcode_llvm_is_available(nextcodeASTSectionImporter)
