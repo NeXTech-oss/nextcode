@@ -28,30 +28,17 @@ begin
    Print_Total_Area(Circles);
 end Main;
 ```
-
-## Killer Features of the Language
-
-- Speed: Enjoy the performance of Mojo, making your applications run at lightning speed.
-- Compilation: Supports both ahead-of-time and just-in-time compilation, similar to Dart, for flexibility in deployment.
-- Null Safety: Borrowing from Swift, NeXTCode ensures null safety without the need for special syntax like "?" after data types.
-- Expressions: NeXTCode adopts Kotlin and Rust's approach where most control-flow structures are expressions.
-- Collections: Null-safe methods on collections are a feature, taking cues from Swift to prevent common errors.
-- Memory Control: Offers close-to-the-metal memory and hardware control akin to Objective-C, with the safety of Go.
-- Syntax: NeXTCode uses a Python and C/C++-based syntax that is familiar and easy to understand.
-- Cross-Compiling: Seamlessly use C# and C/C++, R, Ruby, Fortran and many other's libraries within NeXTCode, thanks to its cross-compiling capabilities.
-- Interop: Enjoy smooth interoperation with C++ code and libraries.
-- Visibility and Accessibility: Introduces hybrid visibility and accessibility modifiers for classes and subroutines.
   
 ## Inspired From:
-- Ada 83/2012 - Safety Features and Reliability
+- Ada 83/2012 - Type System, Safety Features and Reliability
 - Fortran 77 - Legacy Code Integration and Compiler Optimization
 - Assembly - Embedded Systems, Systems Programming
 - Machine Code - Manually adapting language for close-to-the-metal memory and hardware control.
 - Objective-C/C++ - For memory and hardware allocation capabalities
 - C/C++20 - The main programming language used
-- Swift - Syntax, Type System, Expressions
+- ALGOL 68 (MALGOL and ALGEK) - Syntax, Expressions
 - LLVM (Version 18.1.5) - For constructing compiler
-- CMake - A software construction tool
+- Makefile - A software construction tool
 
 ## People behind the NeXTCode
 
