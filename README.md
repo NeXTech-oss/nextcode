@@ -1,32 +1,32 @@
 # Welcome to NeXTCode Programming Language !
-NeXTCode is an innovative programming language that combines the efficiency and speed of Mojo with the elegance and practicality of TypeScript. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
+NeXTCode is an innovative programming language that combines the efficiency and speed of Mojo with the elegance and practicality of Ada. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
 
 ```
-import 'nextcode:math';
+procedure Main is
+   type Circle is record
+      Radius : Float;
+   end record;
 
-class Circle {
-  double radius;
-  static const double pi = 3.14;
+   Pi : constant Float := 3.14;
 
-  Circle(this.radius);
-}
+   function Area(C : Circle) return Float is
+   begin
+      return Pi * C.Radius ** 2;
+   end Area;
 
-function printTotalArea(List<Circle> circles) {
-  double totalArea = 0.0;
-  for (var circle in circles) {
-    totalArea += Circle.pi * pow(circle.radius, 2);
-  }
-  print('Total area: $totalArea');
-}
+   procedure Print_Total_Area(Circles : array of Circle) is
+      Total_Area : Float := 0.0;
+   begin
+      for C of Circles loop
+         Total_Area := Total_Area + Area(C);
+      end loop;
+      Output("Total area: " & Float'Image(Total_Area));
+   end Print_Total_Area;
 
-function main() {
-  List<Circle> circles = [
-    Circle(1.0),
-    Circle(2.0)
-  ];
-  printTotalArea(circles);
-}
-
+   Circles : array(1 .. 2) of Circle := (Circle'(1.0), Circle'(2.0));
+begin
+   Print_Total_Area(Circles);
+end Main;
 ```
 
 ## Killer Features of the Language
