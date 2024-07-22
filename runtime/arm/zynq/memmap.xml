@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<memmap arch="arm">
+  <!--  Main memory (1GB) for Zynq -->
+  <region access="rwx---" cache="wb"
+	  virt="0x00000000" size="0x3ff00000" name="ram"/>
+
+  <!--  Reserved a small part (1MB) of main memory as not cached  -->
+  <region access="rwx---" cache="nc"
+	  virt="0x3ff00000" size="0x00100000" name="ram-uc"/>
+
+  <!-- IO Peripheral -->
+  <region access="rw-rw-" cache="nc"
+	  virt="0xe0000000" size="0x00300000" name="io"/>
+
+  <!-- System registers -->
+  <region access="rw-rw-" cache="nc"
+	  virt="0xf8000000" size="0x01000000" name="sys"/>
+
+  <!--  OCM high, required to boot the secondary processor.  -->
+  <region access="rw-rw-" cache="nc"
+	  virt="0xff000000" size="0x01000000" name="ocm_high"/>
+
+  <!-- Not described: Quad-SPI, GP ports to PL -->
+</memmap>
