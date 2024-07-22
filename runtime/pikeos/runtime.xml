@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<gprconfig>
+  <configuration>
+   <config><![CDATA[
+  Pikeos_Files := external ("PIKEOS_TARGET_FILES",
+                            "/opt/@version@/target/@target@");
+
+   package Compiler is
+     Common_Required_Switches := ("-fno-tree-loop-distribute-patterns");
+
+     for Leading_Required_Switches ("Ada") use
+        Compiler'Leading_Required_Switches ("Ada") &
+        Common_Required_Switches;
+
+     for Leading_Required_Switches ("C") use
+        Compiler'Leading_Required_Switches ("C") &
+        Common_Required_Switches &
+        ("-I" & Pikeos_Files & "/include");
+
+   end Compiler;
+]]>
+   </config>
+  </configuration>
+</gprconfig>

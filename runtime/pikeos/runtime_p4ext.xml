@@ -1,0 +1,57 @@
+<?xml version="1.0" ?>
+
+<gprconfig>
+  <configuration>
+   <config><![CDATA[
+
+  This_Target := project'Canonical_Target;
+  Default_Arch := "";
+  Default_Proc := "";
+  Default_Version := "";
+
+  case This_Target is
+    when "aarch64-pikeos5" | "aarch64-sysgo-pikeos5" =>
+       Default_Arch := "arm";
+       Default_Proc := "v8hf";
+       Default_Version := "5.0";
+    when "arm-pikeos5" | "arm-sysgo-pikeos5" =>
+       Default_Arch := "arm";
+       Default_Proc := "v7hf";
+       Default_Version := "5.0";
+    when "arm-pikeos4.2" | "arm-sysgo-pikeos4" =>
+       Default_Arch := "arm";
+       Default_Proc := "v7hf";
+       Default_Version := "4.2";
+    when "ppc-pikeos5" | "powerpc-sysgo-pikeos5" =>
+       Default_Arch := "ppc";
+       Default_Proc := "e500mc-4g";
+       Default_Version := "5.0";
+    when others =>
+       null;
+   end case;
+
+  Pikeos_Arch := external ("PIKEOS_ARCH", Default_Arch);
+  Pikeos_Proc := external ("PIKEOS_PROC", Default_Proc);
+  Pikeos_Version := external ("PIKEOS_VERSION", Default_Version);
+  Pikeos_Files := external ("PIKEOS_TARGET_FILES",
+                            "/opt/pikeos-" & Pikeos_Version & "/target/"
+                            & Pikeos_Arch & "/" & Pikeos_Proc & "/");
+
+   package Compiler is
+     Common_Required_Switches := ("-fno-tree-loop-distribute-patterns");
+
+     for Leading_Required_Switches ("Ada") use
+        Compiler'Leading_Required_Switches ("Ada") &
+        Common_Required_Switches;
+     for Leading_Required_Switches ("C") use
+        Compiler'Leading_Required_Switches ("C") &
+        Common_Required_Switches &
+        ("-I" & Pikeos_Files & "/include/") &
+        ("-I" & Pikeos_Files & "/pikeos-native/include/") &
+        ("-I" & Pikeos_Files & "/pikeos-native/include/p4ext");
+   end Compiler;
+
+]]>
+   </config>
+  </configuration>
+</gprconfig>
