@@ -1,0 +1,199 @@
+Ravenscar for Xilinx Ultrascale+ boards
+=======================================
+
+Main characteristics:
+---------------------
+
+This runtime supports the running on the quad cortex-A53 SMP APU block of the
+UltraScale+ MPSoC. It targets the Avnet UltraZed board.
+
+- boot from Exception Level 3-1: the boot process is configuring the various
+  EL down to 1 in 64-bit mode. The runtime mode used is EL1 non-secure.
+- MMU: the mmu configuration is expecting 2GB of DDRAM and configures the
+  memory access in 32-bit mode.
+- SMP: the four cores are supported by the runtime in SMP mode.
+- Interrupts: 16 level of interrupt priority are supported, and thus nested
+  interruptions are supported as well. Finally, the use of the FPU is always
+  supported, in tasks and in interrupt handlers.
+
+
+Getting Started with the UltraZed and GNAT
+------------------------------------------
+
+This guide will demonstrate how to run an Ada application on the Avnet
+UltraZed. The process for other UltraScale+ boards is largely similar, except
+you will have to provide a Hardware Platform Specification and a BSP tailored
+for your board.
+
+To begin, you will need to obtain and install from Xilinx:
+
+* Xilinx Software Developent Kit (XSDK) 2017.4 or later
+
+and from GNAT Tracker:
+
+* Gnatbench plugin for Eclipse CDT
+* GNAT for aarch64-elf
+
+
+Preparation
+,,,,,,,,,,,
+
+**GNAT installation:**
+
+Before running XSDK, make sure that GNAT is installed and accessible from
+your environment (PATH). To test, type from your command line:
+
+  $ gprconfig --show-targets
+
+The list should include aarch64-elf.
+
+**Hardware Platform Specification:**
+
+As the UltraScale+ MPSoC is a configurable MPSoC, it requires a Hardware
+Platform Specification. For the Avnet UltraZed, visit their website and
+obtain the *Board Definition Files for Vivado 2017.2 and later* and follow
+the included tutorial. For this guide, the Hardware Platform Specification is
+called "design_1_wrapper_hw_platform_0" specification.
+
+Open XSDK and create a standalone BSP from the *File -> New -> Board Support
+Package*. While this BSP is not strictly needed to build the application, it
+provides XSDK the information how to run or debug the application. Use
+"standalone bsp" as the project name and do not include any extra libraries.
+
+Gnatbench Installation
+,,,,,,,,,,,,,,,,,,,,,,
+
+With XSDK open:
+
+* Click on the menu item *Help->Install New Software*
+* Click on "Add", select "Archive", select the gnatbench zip file
+* Click on "OK"
+* Select AdaCore Plugins for Eclipse/CDT
+* Click on Next and finish the installation
+
+Restart XSDK before proceding to the next step.
+
+Create an Ada Project
+,,,,,,,,,,,,,,,,,,,,,
+
+Click on the menu File -> Other, and select Ada -> Ada Project
+
+In the dialog:
+
+**Project name**:
+  `hello`, use default location (click Next)
+**Project unit name**:
+  `Hello`, Single Project
+**Main Program Settings**:
+  `Hello`, Generate the file as a Hello World application
+**Directories settings**:
+  leave default
+**Ada Builder settings**:
+  click on Scan, select `aarch64-elf`, make sure no other
+  toolchain is selected.
+
+Click on Finish.
+
+Right click on the project, select "Properties". In the "Project References"
+section, add a dependency over "standalone_bsp". Close the dialog.
+
+Right-click on the project hello, choose "Build main" -> "hello.adb".
+
+Run/Debug the Application
+,,,,,,,,,,,,,,,,,,,,,,,,,
+
+**Emulator-based Debugging**
+
+Click on the Menu "Debug" > "Debug Configurations"
+
+Select Xilinx C/C++ application (System Debugger on QEMU), and press the "New"
+button.
+
+* Target setup:
+
+  * Debug Type: "Standalone Application Debug"
+  * Connection: "QEMU"
+  * Hardware Platform: "design_1_wrapper_hw_platform_0"
+
+* Application:
+
+  * Project Name: click on Browse, select `hello`
+  * Application: click on Search, select `hello`
+  * Download checked for psu_cortexa53_0
+  * (optional): check Stop at program entry
+
+Click Apply, then Debug.
+
+This should launch QEMU and switch to the Debug perspective, and stop at
+the entry point (or at main). Clicking on the 'Resume' button will display
+"Hello World!" from the Emulator Console, and reset the simulator.
+
+**On-board Debugging**
+
+To begin:
+
+   * set the board to start in JTAG mode
+   * connect the JTAG module to your host
+   * connect the UART to your host and open a terminal (115200 bauds)
+
+Now click on the Menu "Debug" -> "Debug Configurations"
+
+Select Xilinx C/C++ application (System Debugger), and press the "New" button.
+
+* Target setup:
+
+  * Debug Type: "Standalone Application Debug"
+  * Connection: "Local"
+  * Hardware Platform: "design_1_wrapper_hw_platform_0"
+  * Initialization File: "psu_init.tcl"
+  * Run psu_init is checked
+
+* Application:
+
+  * Project Name: `hello`
+  * Application: select `hello`
+  * Download checked for "psu_cortexa53_0"
+  * Check "Reset processor"
+  * (optional) check Stop at program entry if you need to debug the crt0
+
+Click Apply, then Debug.
+
+The debug view should open automatically and the Cortex-A53 #0 should stop at
+`main`. The main entry point of the hello world example will be displayed.
+Press the continue button and the output "Hello World!" should print on your
+serial console.
+
+Resources used by the runtime:
+------------------------------
+
+- The GIC is configured to redirect the exceptions to the Ada runtime.
+- The Software generated interrupt 0 is reserved by the runtime and should not
+  be used by user code.
+- The UART0 is used as standard input/output by the runtime.
+
+Memory mapping:
+---------------
+
+.. code-block:: xml
+
+  <!-- DDR, 2GB -->
+  <region access="rwx---" cache="wb"
+	  virt="0x00000000" size="0x80000000" name="ram"/>
+
+  <!-- PL -->
+  <region access="rw-rw-" cache="nc"
+	  virt="0x80000000" size="0x40000000" name="pl"/>
+
+  <!-- QSPI, lower PCIe -->
+  <region access="rw-rw-" cache="nc"
+	  virt="0xC0000000" size="0x20000000" name="qspi"/>
+
+  <!-- Peripherals -->
+  <region access="rw-rw-" cache="nc"
+	  virt="0xF8000000" size="0x08000000" name="io"/>
+
+Boot:
+-----
+
+Only booting from RAM is currently supported, with the entry point set to
+0x00000.
