@@ -1,7 +1,7 @@
 # Welcome to NeXTCode Programming Language !
 NeXTCode is an innovative programming language that combines the efficiency and speed of Mojo with the elegance and practicality of Ada. It's designed to be fast, safe, and suitable for both systems programming and rapid application development.
 
-```
+```ada
 procedure Main is
    type Circle is record
       Radius : Float;
