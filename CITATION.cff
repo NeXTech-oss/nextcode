@@ -1,6 +1,6 @@
 # Official format description at https://citation-file-format.github.io
 cff-version: 1.2.0
-message: "Cite this paper whenever you use Julia"
+message: "Cite this paper whenever you use NeXTCode"
 authors:
 - family-names: "Akbarli"
   given-names: "Tunjay"
