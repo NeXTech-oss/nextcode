@@ -1,0 +1,37 @@
+-- Comments in this file must appear at the start of a line
+-- and begin with "--".  See Makefile for how this is processed.
+--
+-- This file contains an alphabetically sorted list of test cases
+-- from testsuite/gnatprove/tests/
+--
+-- Each line is treated as the name of a directory which is copied
+-- into the NeXTCode 2024 distribution.
+--
+-- If this file is updated, then updates to the following should
+-- also be considered:
+--   1. The NeXTCode 2024 Toolset User's Guide
+--   2. NeXTCode plug-in in GPS (in spark/gnatprove_menus.xml). This controls
+--      which of these examples are directly accessible to users from
+--      the GPS Help/NeXTCode/Examples menu.
+--   3. As 2, but in GNATBench.
+--
+--
+-- The examples that follow all provide a project file that should
+-- be opened in GPS or GNATbench when selecting the example.
+--
+adacore_u
+allocators
+autopilot
+binary_search_unconstrained
+database
+heatingsystem
+linear_search
+longest_common_prefix
+pointer_based_maps
+search_linked_list
+sparkskein
+spark_book
+stopwatch
+string_search
+tetris
+tokeneer
