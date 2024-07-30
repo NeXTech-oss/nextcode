@@ -1,0 +1,175 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                            GNATPROVE COMPONENTS                          --
+--                                                                          --
+--                                 C A L L                                  --
+--                                                                          --
+--                                 B o d y                                  --
+--                                                                          --
+-------------------------------------------------------------------------------
+--
+-- Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+--
+-- This code is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+-- version 2 for more details (a copy is included in the LICENSE file that
+-- accompanied this code).
+--
+-- Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+--             Tural Ghuliev (turalquliyev@it-gss.com)
+--
+-------------------------------------------------------------------------------
+
+with Ada.Text_IO;
+with GNATCOLL.Mmap;
+with GNATCOLL.Utils;
+
+package body Call is
+
+   procedure Print_Command_Line
+      (Command   : String;
+       Arguments : Argument_List);
+   --  Print the command line for debug purposes
+
+   ------------------------
+   -- Abort_With_Message --
+   ------------------------
+
+   procedure Abort_With_Message (Msg : String) is
+   begin
+      Ada.Text_IO.Put_Line (Ada.Text_IO.Standard_Error, Msg);
+      GNAT.OS_Lib.OS_Exit (1);
+   end Abort_With_Message;
+
+   ----------------------------------
+   -- Argument_List_Of_String_List --
+   ----------------------------------
+
+   function Argument_List_Of_String_List (S : String_Lists.List)
+      return Argument_List
+   is
+      use String_Lists;
+      Arguments : Argument_List := [1 .. Integer (S.Length) => <>];
+      Cnt       : Positive      := 1;
+   begin
+      for Elem of S loop
+         Arguments (Cnt) := new String'(Elem);
+         Cnt := Cnt + 1;
+      end loop;
+      return Arguments;
+   end Argument_List_Of_String_List;
+
+   ----------------------
+   -- Call_With_Status --
+   ----------------------
+
+   pragma Annotate (Xcov, Exempt_On, "Not called from gnat2why");
+   procedure Call_With_Status
+     (Command     : String;
+      Arguments   : String_Lists.List;
+      Status      : out Integer;
+      Output_Name : String := "";
+      Verbose     : Boolean := False)
+   is
+      Executable : String_Access := Locate_Exec_On_Path (Command);
+      Arg_List   : Argument_List :=
+        Argument_List_Of_String_List (Arguments);
+      Output_FD  : File_Descriptor;
+   begin
+      if Output_Name = "" then
+         Output_FD := Standout;
+      else
+         Output_FD := Create_File (Output_Name, Text);
+      end if;
+
+      if Executable = null then
+         Ada.Text_IO.Put_Line ("Could not find executable " & Command);
+         GNAT.OS_Lib.OS_Exit (1);
+      end if;
+
+      if Verbose then
+         Print_Command_Line (Command, Arg_List);
+         Ada.Text_IO.New_Line;
+      end if;
+
+      Spawn (Executable.all, Arg_List, Output_FD, Status,
+             Err_To_Out => Output_Name /= "");
+
+      if Output_Name /= "" then
+         Close (Output_FD);
+      end if;
+
+      GNATCOLL.Utils.Free (Arg_List);
+      Free (Executable);
+   end Call_With_Status;
+   pragma Annotate (Xcov, Exempt_Off);
+
+   ------------------------
+   -- Print_Command_Line --
+   ------------------------
+
+   pragma Annotate (Xcov, Exempt_On, "Not called from gnat2why");
+   procedure Print_Command_Line
+      (Command   : String;
+       Arguments : Argument_List)
+   is
+   begin
+      Ada.Text_IO.Put (Command);
+
+      for Arg of Arguments loop
+         Ada.Text_IO.Put (" ");
+         Ada.Text_IO.Put (Arg.all);
+      end loop;
+   end Print_Command_Line;
+   pragma Annotate (Xcov, Exempt_Off);
+
+   -------------------------
+   -- Read_File_Into_JSON --
+   -------------------------
+
+   function Read_File_Into_JSON (Fn : String) return JSON_Value is
+      Result : constant Read_Result := Read_File (Fn);
+   begin
+      if not Result.Success then
+         --  ??? We should close the file here, but the subprogram is likely
+         --  to terminate anyway, so this is not cruci.
+         raise Invalid_JSON_Stream with Format_Parsing_Error (Result.Error);
+      end if;
+
+      return Result.Value;
+   end Read_File_Into_JSON;
+
+   ---------------------------
+   -- Read_File_Into_String --
+   ---------------------------
+
+   pragma Annotate (Xcov, Exempt_On, "Not called from gnat2why");
+   function Read_File_Into_String (Fn : String) return String
+   is
+      use GNATCOLL.Mmap;
+      File   : Mapped_File;
+      Region : Mapped_Region;
+
+   begin
+
+      File := Open_Read (Fn);
+
+      Read (File, Region);
+
+      declare
+         S : String (1 .. Integer (Length (File)));
+         for S'Address use Data (Region).all'Address;
+         --  A fake string directly mapped onto the file contents
+
+      begin
+         return Result : constant String := S do
+            Free (Region);
+            Close (File);
+         end return;
+      end;
+   end Read_File_Into_String;
+   pragma Annotate (Xcov, Exempt_Off);
+
+end Call;

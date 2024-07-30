@@ -1,0 +1,103 @@
+-------------------------------------------------------------------------------
+--
+-- Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+--
+-- This code is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+-- version 2 for more details (a copy is included in the LICENSE file that
+-- accompanied this code).
+--
+-- Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+--             Tural Ghuliev (turalquliyev@it-gss.com)
+--
+-------------------------------------------------------------------------------
+
+with Ada.Containers;
+with Ada.Containers.Doubly_Linked_Lists;
+with GNATCOLL.JSON;                      use GNATCOLL.JSON;
+with GNATCOLL.Symbols;                   use GNATCOLL.Symbols;
+
+package Assumption_Types is
+
+   type Subp_Type is private;
+   type Unit_Type is private;
+
+   type Base_Sloc is record
+      File : Symbol;
+      Line : Integer;
+   end record;
+
+   Null_Subp : constant Subp_Type;
+
+   function Base_Sloc_File (Subp : Base_Sloc) return String;
+
+   package Sloc_Lists is new Ada.Containers.Doubly_Linked_Lists
+     (Element_Type => Base_Sloc,
+      "="          => "=");
+
+   subtype My_Sloc is Sloc_Lists.List;
+   --  The type of slocs used in assumptions and more generally in the report
+   --  file.
+
+   function Subp_Name (Subp : Subp_Type) return String;
+   function Subp_Sloc (Subp : Subp_Type) return My_Sloc;
+
+   --  JSON conversion of Subp_Type. To save space and allow for mappings that
+   --  involve subps, subps in JSON appear as numbers. A table (which should be
+   --  stored in any JSON file that contains elements of Subp_Type) maps those
+   --  numbers to the actual entities. The functions From_JSON/To_JSON convert
+   --  Subp_Type from/to these numbers (which are internally generated) in JSON
+   --  form, so that it is mostly transparent to users.
+   --  Users can retrieve the entity table (to put it in the JSON file) via the
+   --  function Entity_Table. Note that the function should be called at
+   --  the very end of the process of JSON generation, to be sure that all
+   --  Subp_Type objects appear in the table.
+
+   --  When parsing a JSON file, the table should be read in first. If you read
+   --  in several JSON files, make sure to parse the entire file (calling
+   --  From_JSON on all Subp_Type objects) before moving on to the next one.
+
+   --  The functinos To_Key/From_Key are there to allow generating strings from
+   --  Subp_Type, so that they can be used in JSON mappings.
+
+   function Entity_Table return JSON_Value;
+   procedure Parse_Entity_Table (Table : JSON_Value);
+
+   function From_JSON (V : JSON_Value) return Subp_Type;
+   function From_Key (V : String) return Subp_Type;
+   function To_JSON (S : Subp_Type) return JSON_Value;
+   function To_Key (S : Subp_Type) return String;
+
+   function Mk_Base_Sloc (File : String; Line : Positive) return Base_Sloc;
+   function Mk_Subp (Name : String; Sloc : My_Sloc) return Subp_Type;
+   --  Build a subp object from its defining components
+
+   function Mk_Unit (Name : String) return Unit_Type;
+   --  Build a unit from its name
+
+   function Unit_Name (Unit : Unit_Type) return String;
+
+   function Hash (S : Subp_Type) return Ada.Containers.Hash_Type;
+   function Hash (S : Unit_Type) return Ada.Containers.Hash_Type;
+
+   function "<" (Left, Right : Subp_Type) return Boolean;
+   function "<" (Left, Right : Unit_Type) return Boolean;
+
+   function Is_Null (S : Subp_Type) return Boolean;
+
+private
+
+   type Unit_Type is new Symbol;
+
+   type Subp_Type_Rec is record
+      Name : Symbol;
+      Sloc : My_Sloc;
+   end record;
+
+   type Subp_Type is access constant Subp_Type_Rec;
+   Null_Subp : constant Subp_Type := null;
+
+   function Is_Null (S : Subp_Type) return Boolean is (S = null);
+end Assumption_Types;
