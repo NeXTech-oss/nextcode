@@ -1,0 +1,10 @@
+def my_plan():
+    anod_install("alt-ergo", query_range=20)
+    anod_install("colibri", query_range=20)
+    anod_install("gprbuild", target="host", query_range=20)
+    anod_build("gcc")
+    anod_build("gnsa")
+    anod_build("spark2014-doc")
+    anod_build("spark2014", qualifier="assertions")
+    anod_test("spark2014", qualifier="assertions")
+    anod_test("acats-4-gnatprove-baseline", qualifier="assertions")

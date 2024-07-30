@@ -1,0 +1,91 @@
+with "gnat2why_gnat";
+with "gnat2why_c";
+with "gnatcoll_core";
+
+project GNAT2Why is
+
+   for Object_Dir use "obj";
+   for Exec_Dir use "../install/bin";
+
+   for Source_Dirs use (".", "..", "obj-gnat2why",
+                        "../src/why", "../src/spark", "../src/utils",
+                        "../src/flow", "../src/common", "../src/counterexamples");
+
+   for Main use ("gnat1drv.adb");
+
+   package Compiler renames GNAT2Why_GNAT.Compiler;
+
+   package Builder renames GNAT2Why_GNAT.Builder;
+
+   package IDE is
+      for VCS_Kind use "Auto";
+   end IDE;
+
+   package Analyzer is
+
+      for Review_File use "analyzer/gnat2why.sar";
+
+      --  Relocate outputs outside of object directory because that one is
+      --  cached in CIs and we do not want to store baselines in the cache.
+      for Output_Dir use "analyzer";
+
+      for Switches ("analyze") use ("-j0", "--incrementality-method=minimal",
+         "--no-gnatcheck");
+      for Switches ("infer") use ("--disable-issue-type", "MEMORY_LEAK_ADA");
+      for Switches ("inspector") use ("--legacy-level", "1", "-gnatws");
+
+      Filter := "--show=kind=check+warning-suspicious_constant_operation";
+      for Switches ("report text") use (Filter, "--show-backtraces");
+      for Switches ("report exit-code") use (Filter);
+      for Switches ("report code-climate") use (Filter, "--long-desc");
+
+      for Excluded_Source_Dirs use ("gnat_src");
+
+      for Excluded_Source_Files use
+        (--  Exclude source files leading to false positives
+         "assumptions.ads",
+         "assumptions.adb",
+         "flow.ads",
+         "flow-analysis.adb",
+         "flow-analysis-sanity.adb",
+         "flow-control_flow_graph.adb",
+         "flow-data_dependence_graph.adb",
+
+         --  Exclude generated frontend files
+         "obj/einfo-entities.adb",
+         "obj/sinfo-nodes.adb");
+
+   end Analyzer;
+
+   package Coverage is
+
+      for Excluded_Units use (--  Exclude files that cause errors
+                              "ce_interval_sets",
+                              "ce_pretty_printing",
+
+                              --  Exclude units not exercized in gnat2why itself
+                              "assumptions.search",
+                              "memcache_client",
+                              "named_semaphores",
+
+                              --  Exclude generated units intentionally not fully covered
+                              "gnat1drv",
+                              "why.atree.accessors",
+                              "why.atree.builders",
+                              "why.atree.mutators",
+                              "why.atree.to_json",
+                              "why.atree.traversal",
+                              "why.atree.traversal_stub",
+                              "why.conversions",
+
+                              --  Exclude units for debugging/assertions
+                              "flow_debug",
+                              "spark_xrefs",
+                              "why.atree.treepr",
+                              "why.atree.validity",
+                              "why.images",
+                              "why.kind_validity"
+                              );
+   end Coverage;
+
+end GNAT2Why;

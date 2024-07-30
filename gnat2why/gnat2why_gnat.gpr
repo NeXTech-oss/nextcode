@@ -1,0 +1,79 @@
+project GNAT2Why_GNAT is
+
+   for Object_Dir use "obj";
+   for Exec_Dir use "../install/bin";
+
+   for Source_Dirs use ("obj", "gnat_src", "obj-gnat");
+   for Excluded_Source_Files use ("back_end.adb", "gnat1drv.adb");
+
+   type Build_Type is ("Debug", "Devel", "Production");
+   --  Debug: all checks enabled
+   --  Devel: inexpensive checks enabled, expensive checks disabled
+   --  Production: all checks disabled
+
+   Build : Build_Type := External ("Build", "Devel");
+   Coverage := External ("Coverage", "");
+
+   Tool := External ("GPR_TOOL", "");
+
+   Common_Switches := ("-g", "-gnat2022");
+   --  These are appended after other switches, in particular, after -gnatg,
+   --  which sets the Ada version to 2012.
+
+   case Coverage is
+     when "yes" =>
+       Common_Switches := Common_Switches & ("-O0");
+     when others =>
+       null;
+   end case;
+
+   package Compiler is
+      case Tool is
+         when "gnatsas" =>
+            --  disable use of pragma configuration files when running
+            --  GNAT SAS
+            null;
+         when Others =>
+            for Local_Configuration_Pragmas use "gnat.adc";
+      end case;
+
+      case Build is
+         when "Debug" | "Devel" =>
+            for Switches ("Ada") use
+               ("-O0", "-gnatg", "-gnata", "-gnatVa") & Common_Switches;
+         when "Production" =>
+            for Switches ("Ada") use
+               ("-O2", "-gnatg", "-gnatpn", "-gnatwn") & Common_Switches;
+      end case;
+   end Compiler;
+
+   package Builder is
+      for Executable ("gnat1drv.adb") use "gnat2why";
+
+      case Build is
+         when "Debug" =>
+            case Tool is
+               when "gnatsas" =>
+                  --  disable use of pragma configuration files when running
+                  --  GNAT SAS
+                  null;
+               when Others =>
+                  for Global_Configuration_Pragmas use "debug.adc";
+            end case;
+         when "Devel" =>
+            case Tool is
+               when "gnatsas" =>
+                  --  disable use of pragma configuration files when running
+                  --  GNAT SAS
+                  null;
+               when Others =>
+                  for Global_Configuration_Pragmas use "devel.adc";
+            end case;
+         when "Production" =>
+            null;
+      end case;
+
+      for Switches ("Ada") use ("-m");
+   end Builder;
+
+end GNAT2Why_GNAT;
