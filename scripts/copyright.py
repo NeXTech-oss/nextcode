@@ -75,7 +75,7 @@ def in_files(dir):
     for root, _dirs, files in os.walk(dir):
         for f in files:
             ext = os.path.splitext(f)[1]
-            if ext in (".ads", ".adb", ".c", ".h"):
+            if ext in (".header", ".code", ".c", ".h"):
                 name = os.path.join(root, f)
                 process_file(name)
 
