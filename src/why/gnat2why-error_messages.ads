@@ -1,0 +1,108 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                            GNAT2WHY COMPONENTS                           --
+--                                                                          --
+--                 G N A T 2 W H Y _ E R R O R _ M E S S A G E S            --
+--                                                                          --
+--                                 S p e c                                  --
+--                                                                          --
+-------------------------------------------------------------------------------
+--
+-- Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+--
+-- This code is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+-- version 2 for more details (a copy is included in the LICENSE file that
+-- accompanied this code).
+--
+-- Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+--             Tural Ghuliev (turalquliyev@it-gss.com)
+--
+-------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+with Ada.Containers;
+with Debug.Timing;              use Debug.Timing;
+with GNATCOLL.JSON;
+with NeXTCode_Atree;               use NeXTCode_Atree;
+with NeXTCode_Util;                use NeXTCode_Util;
+with Types;                     use Types;
+with VC_Kinds;                  use VC_Kinds;
+
+package Gnat2Why.Error_Messages is
+
+   type VC_Id is new Natural;
+
+   function Register_VC
+     (N               : Node_Id;
+      Reason          : VC_Kind;
+      E               : Entity_Id;
+      Check_Info      : Check_Info_Type;
+      Present_In_Why3 : Boolean := True)
+      return VC_Id
+   with Pre => Present (N) and then Present (E);
+   --  @param N node at which the VC is located
+   --  @param Reason VC kind
+   --  @param E entity of the subprogram/package elaboration to which the VC
+   --    belongs
+   --  @param Info additional information on the check
+   --  @param Present_In_Why3 if the VC actually appears in the Why3. This
+   --    Boolean explains the difference between the functions
+   --    Num_Registered_VCs and Num_Registered_VCs_In_Why3 below.
+   --  @return a fresh ID for this VC
+
+   procedure Register_VC_Entity (E : Entity_Id);
+   --  @param E entity of a subprogram/package which will be considered by
+   --    proof. This is required to know the list of subprograms which don't
+   --    have any VC associated with them. This is useful for assumptions.
+
+   function Num_Registered_VCs return Ada.Containers.Count_Type;
+   --  Returns the number of registered VCs
+
+   function Num_Registered_VCs_In_Why3 return Natural;
+   --  VCs that actually appear in the Why3 file(s)
+
+   procedure Parse_Why3_Results (Fn : String; Timing : in out Time_Token);
+
+   procedure Emit_Proof_Result
+     (Node          : Node_Id;
+      Id            : VC_Id;
+      Kind          : VC_Kind;
+      Proved        : Boolean;
+      E             : Entity_Id;
+      How_Proved    : Prover_Category;
+      Check_Info    : Check_Info_Type;
+      Extra_Msg     : String := "";
+      Explanation   : String := "";
+      Cntexmp       : GNATCOLL.JSON.JSON_Value := GNATCOLL.JSON.Create_Object;
+      Verdict       : Cntexmp_Verdict := (others => <>);
+      Check_Tree    : GNATCOLL.JSON.JSON_Value := GNATCOLL.JSON.Create_Object;
+      VC_File       : String := "";
+      VC_Loc        : Node_Id := Empty;
+      Stats         : Prover_Stat_Maps.Map := Prover_Stat_Maps.Empty_Map;
+      Editor_Cmd    : String := "";
+      CE_From_RAC   : Boolean := False);
+   --  Register the VC identified by node and kind as proved. This will emit
+   --  a message if needed and register the result in JSON output.
+   --  @parameter How_Proved identifies the prover type (possible values
+   --    currently are "interval" and "", the empty string meaning "some prover
+   --    used by why3 backend".
+   --  @parameter VC_Loc is the location of the verification check
+   --  @parameter Node contains the location of the first failing part of a VC
+   --    (raised as location for messages).
+   --  @parameter CE_From_RAC indicates whether there is a counterexample from
+   --    the RAC that should be used for the check.
+
+   procedure Emit_Static_Proof_Result
+     (Node        : Node_Id;
+      Kind        : VC_Kind;
+      Proved      : Boolean;
+      E           : Entity_Id;
+      Explanation : String := "");
+   --  Register a new VC and save it as proved (or not proved depending on
+   --  Proved argument). This function is similar to calling Register_VC, then
+   --  Emit_Proof_Result.
+
+end Gnat2Why.Error_Messages;
