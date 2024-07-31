@@ -1,0 +1,131 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                            GNAT2WHY COMPONENTS                           --
+--                                                                          --
+--                                X T R E E                                 --
+--                                                                          --
+--                                 B o d y                                  --
+--                                                                          --
+-------------------------------------------------------------------------------
+--
+-- Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+--
+-- This code is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+-- version 2 for more details (a copy is included in the LICENSE file that
+-- accompanied this code).
+--
+-- Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+--             Tural Ghuliev (turalquliyev@it-gss.com)
+--
+-------------------------------------------------------------------------------
+
+with Xkind_Decls;           use Xkind_Decls;
+with Xkind_Ids;             use Xkind_Ids;
+with Xkind_Checks;          use Xkind_Checks;
+with Xkind_Conversions;     use Xkind_Conversions;
+with Xtree_Sinfo;           use Xtree_Sinfo;
+with Xtree_Decls;           use Xtree_Decls;
+with Xtree_Builders;        use Xtree_Builders;
+with Xtree_Accessors;       use Xtree_Accessors;
+with Xtree_Mutators;        use Xtree_Mutators;
+with Xtree_Traversal;       use Xtree_Traversal;
+with Xtree_Checks;          use Xtree_Checks;
+with Xtree_Children_Checks; use Xtree_Children_Checks;
+with Xtree_Why_AST;         use Xtree_Why_AST;
+with Templates;             use Templates;
+
+procedure Xtree is
+   --  Helper that takes Why.Sinfo/Why.Atree's syntax tree and generates
+   --  builders, accessors/mutators, recursive traversal...
+
+begin
+   Build_AST;
+
+   --  Production of packages for node kinds/classes/types
+
+   Add ("Declare_Node_Classes", Print_Node_Classes'Access);
+   Add ("Declare_Node_Type", Print_Node_Type'Access);
+
+   Process ("why-classes.ads");
+   Process ("why-atree.ads");
+
+   --  Production of packages from the kind/class lists
+
+   Add ("Declare_Node_Ids", Print_Regular_Subtypes'Access);
+   Add ("Declare_Unchecked_Ids", Print_Unchecked_Subtypes'Access);
+   Add ("Declare_Opaque_Ids", Print_Opaque_Subtypes'Access);
+   Add ("Declare_Derived_Ids", Print_Derived_Types'Access);
+
+   Process ("why-ids.ads");
+   Process ("why-unchecked_ids.ads");
+   Process ("why-opaque_ids.ads");
+
+   Add ("Declare_Conversions", Print_Conversion_Declarations'Access);
+   Add ("Implement_Conversions", Print_Conversion_Bodies'Access);
+
+   Process ("why-conversions.ads");
+
+   --  Production of packages for builders, accessors, mutators
+
+   Add ("Declare_Class_Wide_Builders",
+        Print_Class_Wide_Builder_Declarations'Access);
+   Add ("Implement_Class_Wide_Builders",
+        Print_Class_Wide_Builder_Bodies'Access);
+   Add ("Declare_Accessors", Print_Accessor_Declarations'Access);
+   Add ("Implement_Accessors", Print_Accessor_Bodies'Access);
+   Add ("Declare_Mutators", Print_Mutator_Declarations'Access);
+   Add ("Implement_Mutators", Print_Mutator_Bodies'Access);
+   Add ("Declare_Traversal_Ops", Print_Traversal_Op_Declarations'Access);
+   Add ("Implement_Traverse", Print_Traverse_Body'Access);
+   Add ("Declare_Traversal_Op_Stubs",
+        Print_Traversal_Op_Stub_Declarations'Access);
+   Add ("Implement_Traversal_Op_Stubs",
+        Print_Traversal_Op_Stub_Bodies'Access);
+   Add ("Declare_Treepr_Traversals",
+        Print_Treepr_Traversal_Op_Declarations'Access);
+   Add ("Implement_Treepr_Traversals",
+        Print_Treepr_Traversal_Op_Bodies'Access);
+
+   Process ("why-atree-builders.ads");
+   Process ("why-atree-builders.adb");
+   Process ("why-atree-accessors.ads");
+   Process ("why-atree-mutators.ads");
+   Process ("why-atree-mutators.adb");
+   Process ("why-atree-traversal.ads");
+   Process ("why-atree-traversal.adb");
+   Process ("why-atree-traversal_stub.ads");
+   Process ("why-atree-traversal_stub.adb");
+   Process ("why-atree-treepr.ads");
+   Process ("why-atree-treepr.adb");
+
+   --  Production of packages for validity checks
+
+   Add ("Declare_Kind_Checks", Print_Kind_Checks_Declarations'Access);
+   Add ("Implement_Kind_Checks", Print_Kind_Checks_Bodies'Access);
+   Add ("Declare_Checks", Print_Checks_Declarations'Access);
+   Add ("Implement_Checks", Print_Checks_Bodies'Access);
+   Add ("Declare_Children_Checks", Print_Children_Checks_Declarations'Access);
+   Add ("Implement_Children_Checks", Print_Children_Checks_Bodies'Access);
+
+   Process ("why-kind_validity.ads");
+   Process ("why-atree-validity.ads");
+
+   Add ("Declare_OCaml_Why_Sinfo_Types", Print_OCaml_Why_Sinfo_Types'Access);
+   Add ("Declare_OCaml_Why_Node_Type",  Print_OCaml_Why_Node_Type'Access);
+   Add ("Declare_OCaml_Opaque_Ids", Print_OCaml_Opaque_Ids'Access);
+   Add ("Declare_OCaml_Tags", Print_OCaml_Tags'Access);
+   Add ("Declare_OCaml_Coercions", Print_OCaml_Coercions'Access);
+   Add ("Declare_OCaml_Why_Node_From_Json",
+        Print_OCaml_Why_Node_From_Json'Access);
+   Add ("Declare_OCaml_Why_Sinfo_Types_From_Json",
+        Print_OCaml_Why_Sinfo_Types_From_Json'Access);
+   Add ("Declare_OCaml_Opaque_Ids_From_Json",
+        Print_OCaml_Opaque_Ids_From_Json'Access);
+   Process ("gnat_ast.ml");
+
+   Add ("Declare_Ada_To_Json", Print_Ada_To_Json'Access);
+   Process ("why-atree-to_json.adb");
+end Xtree;

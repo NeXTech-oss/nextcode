@@ -1,0 +1,530 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                            GNAT2WHY COMPONENTS                           --
+--                                                                          --
+--                       X T R E E _ B U I L D E R S                        --
+--                                                                          --
+--                                 B o d y                                  --
+--                                                                          --
+-------------------------------------------------------------------------------
+--
+-- Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+--
+-- This code is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+-- version 2 for more details (a copy is included in the LICENSE file that
+-- accompanied this code).
+--
+-- Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+--             Tural Ghuliev (turalquliyev@it-gss.com)
+--
+-------------------------------------------------------------------------------
+
+with Why.Sinfo;     use Why.Sinfo;
+with Xtree_Tables;  use Xtree_Tables;
+with Xkind_Tables;  use Xkind_Tables;
+
+package body Xtree_Builders is
+
+   New_Node    : constant String := "New_Node";
+   New_Node_Id : constant String := "New_Node_Id";
+
+   Empty_Nodes : constant String := "Empty_Nodes";
+
+   procedure Print_Builder_Declaration
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String);
+   --  Print builder declaration for the given node kind
+
+   procedure Print_Builder_Specification
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String);
+   --  Ditto, but with a return type that is different from the
+   --  default one.
+
+   procedure Print_Builder_Body
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String);
+   --  Ditto, but with a return type that is different from the
+   --  default one.
+
+   procedure Print_Builder_Implementation
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String := "");
+   --  Print the handled sequence of statements that implements this builder
+
+   procedure Print_Builder_Local_Declarations
+     (O  : in out Output_Record;
+      IK : Id_Kind);
+   --  Print the local declarations in builder body
+
+   ------------------------
+   -- Print_Builder_Body --
+   ------------------------
+
+   procedure Print_Builder_Body
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String)
+   is
+      BN : constant String := Builder_Name (Kind, IK);
+   begin
+      Print_Box (O, BN);
+      NL (O);
+
+      Print_Builder_Specification (O, Kind, IK, Return_Type);
+      NL (O);
+      PL (O, "is");
+      PL (O, "begin");
+      Relative_Indent (O, 3);
+      Print_Builder_Implementation (O, Kind, IK, Return_Type);
+      Relative_Indent (O, -3);
+      PL (O, "end " & BN & ";");
+   end Print_Builder_Body;
+
+   -------------------------------
+   -- Print_Builder_Declaration --
+   -------------------------------
+
+   procedure Print_Builder_Declaration
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String)
+   is
+   begin
+      Print_Builder_Specification (O, Kind, IK, Return_Type);
+      PL (O, ";");
+   end Print_Builder_Declaration;
+
+   ----------------------------------
+   -- Print_Builder_Implementation --
+   ----------------------------------
+
+   procedure Print_Builder_Implementation
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String := "")
+   is
+      use Node_Lists;
+
+      Variant_Part : constant Why_Node_Info := Why_Tree_Info (Kind);
+
+      function K (S : String) return String;
+      --  If IK /= Derived, return S. Otherwise, prefix S by a call to
+      --  a conversion.
+
+      procedure Print_Record_Initialization (Position : Cursor);
+
+      -------
+      -- K --
+      -------
+
+      function K (S : String) return String is
+      begin
+         if IK = Derived then
+            return Return_Type & " (" & S & ")";
+         else
+            return S;
+         end if;
+      end K;
+
+      ---------------------------------
+      -- Print_Record_Initialization --
+      ---------------------------------
+
+      procedure Print_Record_Initialization (Position : Cursor) is
+         FI : constant Field_Info := Element (Position);
+         FN : constant String := Field_Name (FI);
+
+         function K (S : String) return String;
+         --  If IK is Derived or FI is a Why Id, prefix S by a call to a
+         --  conversion operator ("+").
+
+         -------
+         -- K --
+         -------
+
+         function K (S : String) return String is
+         begin
+            if IK = Derived and then Is_Why_Id (FI) then
+               declare
+                  M : constant Id_Multiplicity :=
+                        (if Multiplicity (FI) = Id_One
+                           or else Multiplicity (FI) = Id_Some
+                         then
+                           Id_One
+                         else
+                           Id_Lone);
+               begin
+                  return "+("
+                    & Id_Subtype (Node_Kind (FI), Regular, M)
+                    & " (" & S & "))";
+               end;
+            else
+               return S;
+            end if;
+         end K;
+
+      begin
+         if IK = Unchecked or else Field_Kind (FI) = Field_Special then
+            PL (O, New_Node & "." & FN & " :=");
+
+            if Has_Default_Value (Kind, FI, IK, In_Builder_Body) then
+               P (O, "  " & Default_Value (Kind, FI, IK, In_Builder_Body));
+            else
+               P (O, "  " & Param_Name (FI));
+            end if;
+
+            PL (O, ";");
+
+         elsif Field_Kind (FI) = Field_Domain
+           and then Is_Domain (Return_Type)
+         then
+            PL (O, New_Node & "." & FN & " := "
+                & Mixed_Case_Name (Get_Domain (Return_Type)) & ";");
+
+         elsif Field_Kind (FI) = Field_Domain
+           and then Get_Domain (Kind) /= EW_Expr
+         then
+            PL (O, New_Node & "." & FN & " := "
+                & Mixed_Case_Name (Get_Domain (Kind)) & ";");
+
+         else
+            if Is_List (FI) then
+               if not Maybe_Null (FI) then
+                  PL (O, "pragma Assert ("
+                      & Param_Name (FI) & "'Length > 0);");
+               end if;
+
+               PL (O, New_Node & "." & FN & " := New_List;");
+               PL (O, "for J in " & Param_Name (FI) & "'Range loop");
+               Relative_Indent (O, 3);
+               PL (O, "pragma Assert");
+               PL (O, "  (" & Kind_Check (Node_Kind (FI), Id_One));
+               PL (O, "   (" & K (Param_Name (FI)  & " (J)") & "));");
+               PL (O, "pragma Assert");
+               PL (O, "  (" & Tree_Check (Node_Kind (FI), Id_One));
+               PL (O, "   (" & K (Param_Name (FI)  & " (J)") & "));");
+               PL (O, List_Op_Name (Op_Append));
+               PL (O, "  (" & New_Node & "." & FN & ",");
+               PL (O, "   " & K (Param_Name (FI) & " (J)") & ");");
+               Relative_Indent (O, -3);
+               PL (O, "end loop;");
+            else
+               PL (O, New_Node & "." & FN & " :=");
+               P (O, "  " & K (Param_Name (FI)));
+               PL (O, ";");
+            end if;
+         end if;
+
+      end Print_Record_Initialization;
+
+   --  Start of processing for Print_Builder_Implementation
+
+   begin
+      PL (O, "Node_Table.Append (" &
+             Empty_Nodes & "." & Mixed_Case_Name (Kind) & "_Node);");
+      PL (O, "declare");
+      Relative_Indent (O, 3);
+      Print_Builder_Local_Declarations (O, IK);
+      Relative_Indent (O, -3);
+      PL (O, "begin");
+      Relative_Indent (O, 3);
+      Common_Fields.Fields.Iterate (Print_Record_Initialization'Access);
+      Variant_Part.Fields.Iterate (Print_Record_Initialization'Access);
+      PL (O, "return " & K (New_Node_Id) & ";");
+      Relative_Indent (O, -3);
+      PL (O, "end;");
+   end Print_Builder_Implementation;
+
+   --------------------------------------
+   -- Print_Builder_Local_Declarations --
+   --------------------------------------
+
+   procedure Print_Builder_Local_Declarations
+     (O  : in out Output_Record;
+      IK : Id_Kind)
+   is
+   begin
+      PL (O, New_Node_Id & " : constant Why_Node_Id := " &
+             "Node_Table.Last_Index;");
+      PL (O, New_Node & " : Why_Node renames " &
+             "Node_Table (" & New_Node_Id & ");");
+      PL (O, Checked_Default_Value & " : constant Boolean :=");
+
+      if IK = Unchecked then
+         PL (O, "  False;");
+      else
+         PL (O, "  True;");
+      end if;
+   end Print_Builder_Local_Declarations;
+
+   ---------------------------------
+   -- Print_Builder_Specification --
+   ---------------------------------
+
+   procedure Print_Builder_Specification
+     (O           : in out Output_Record;
+      Kind        : Why_Node_Kind;
+      IK          : Id_Kind;
+      Return_Type : String)
+   is
+      use Node_Lists;
+
+      Variant_Part  : constant Why_Node_Info :=
+                        Why_Tree_Info (Kind);
+      Max_Param_Len : Natural;
+      Field_Number  : Positive := 1;
+
+      procedure Print_Parameter_Specification (Position : Cursor);
+
+      -----------------------------------
+      -- Print_Parameter_Specification --
+      -----------------------------------
+
+      procedure Print_Parameter_Specification (Position : Cursor)
+      is
+         Name_Len : Natural;
+         FI       : constant Field_Info := Element (Position);
+         PN       : constant String := Param_Name (FI);
+      begin
+         if Field_Kind (FI) = Field_Special then
+            return;
+         end if;
+
+         if Field_Kind (FI) = Field_Domain
+           and then Is_Domain (Return_Type)
+         then
+            return;
+         end if;
+
+         if Field_Kind (FI) = Field_Domain
+           and then Get_Domain (Kind) /= EW_Expr
+         then
+            return;
+         end if;
+
+         if IK = Unchecked then
+            if Has_Default_Value (Kind, FI, IK, In_Builder_Spec) then
+               return;
+            end if;
+         end if;
+
+         if Field_Number = 1 then
+            P (O, "(");
+            Relative_Indent (O, 1);
+         else
+            PL (O, ";");
+         end if;
+
+         P (O, PN);
+         Name_Len := PN'Length;
+
+         --  Align columns
+
+         if IK = Unchecked then
+            P (O, " ");
+         else
+            Adjust_Columns (O, Name_Len, Max_Param_Len);
+         end if;
+
+         P (O, ": ");
+
+         if IK = Unchecked then
+            P (O, Builder_Param_Type (FI, Regular, In_Builder_Spec));
+         else
+            declare
+               Param_Type : constant String :=
+                 Builder_Param_Type (FI, IK, In_Builder_Spec);
+            begin
+               --  Specialize the type of parameters when creating a
+               --  program/term/predicate node, as its fields should in
+               --  general be of the same subtype.
+
+               if Return_Type = "W_Prog_Id" then
+                  if Param_Type = "W_Expr_Id" then
+                     P (O, "W_Prog_Id");
+                  elsif Param_Type = "W_Expr_OId" then
+                     P (O, "W_Prog_OId");
+                  elsif Kind in W_Connection | W_Conditional
+                    and then Param_Type = "W_Expr_Array"
+                  then
+                     P (O, "W_Prog_Array");
+                  else
+                     P (O, Param_Type);
+                  end if;
+
+               elsif Return_Type = "W_Term_Id" then
+                  if Param_Type = "W_Expr_Id" then
+                     P (O, "W_Term_Id");
+                  elsif Param_Type = "W_Expr_OId" then
+                     P (O, "W_Term_OId");
+                  else
+                     P (O, Param_Type);
+                  end if;
+
+               elsif Return_Type = "W_Pred_Id" then
+                  if Param_Type = "W_Expr_Id" then
+
+                     --  Special case for the Def field in a Binding predicate,
+                     --  which must of term subtype.
+
+                     if PN = "Def"
+                       and then Kind = W_Binding
+                     then
+                        P (O, "W_Term_Id");
+                     else
+                        P (O, "W_Pred_Id");
+                     end if;
+                  elsif Param_Type = "W_Expr_OId" then
+                     P (O, "W_Pred_OId");
+                  elsif Kind in W_Connection | W_Conditional
+                    and then Param_Type = "W_Expr_Array"
+                  then
+                     P (O, "W_Pred_Array");
+                  else
+                     P (O, Param_Type);
+                  end if;
+               else
+                  P (O, Param_Type);
+               end if;
+            end;
+         end if;
+
+         if Has_Default_Value (Kind, FI, IK, In_Builder_Spec) then
+            P (O, " := ");
+            P (O, Default_Value (Kind, FI, IK, In_Builder_Spec));
+         end if;
+
+         Field_Number := Field_Number + 1;
+      end Print_Parameter_Specification;
+
+   --  Start of processing for Print_Builder_Specification
+
+   begin
+      Max_Param_Len := Max_Param_Length (Kind);
+      PL (O, "function " & Builder_Name (Kind, IK));
+      Relative_Indent (O, 2);
+
+      Common_Fields.Fields.Iterate (Print_Parameter_Specification'Access);
+      Variant_Part.Fields.Iterate (Print_Parameter_Specification'Access);
+
+      if Field_Number > 1 then
+         PL (O, ")");
+         Relative_Indent (O, -1);
+      end if;
+
+      P (O, "return " & Return_Type);
+      Relative_Indent (O, -2);
+   end Print_Builder_Specification;
+
+   -------------------------------------------
+   -- Print_Class_Wide_Builder_Declarations --
+   -------------------------------------------
+
+   procedure Print_Class_Wide_Builder_Declarations (O : in out Output_Record)
+   is
+   begin
+      for Kind in Valid_Kind'Range loop
+         Print_Builder_Declaration (O, Kind, Derived,
+                                    Id_Subtype (Kind, Derived));
+
+         for CI of Classes loop
+            if Kind in Class_First (CI) .. Class_Last (CI)
+              and then Class_Name (CI) /= "W_Any_Node"
+            then
+               NL (O);
+
+               Print_Builder_Declaration (O, Kind, Derived,
+                                          Id_Subtype (Class_Name (CI),
+                                                      Derived));
+            end if;
+         end loop;
+
+         if Kind /= Valid_Kind'Last then
+            NL (O);
+         end if;
+      end loop;
+   end Print_Class_Wide_Builder_Declarations;
+
+   procedure Print_Class_Wide_Empty_Nodes (O : in out Output_Record);
+   --  Print persistent empty nodes of each kind
+   --
+   --  As Why_Node is a controlled type and it is stored an instance of
+   --  Ada.Containers.Indefinite_Vectors, it is relatively expensive to create
+   --  nodes locally, copying them into Node_Table and then destroying.
+   --
+   --  Instead, we declare persistent empty nodes for each node kind, which are
+   --  never destroyed, insert them into Node_Tables when needed and populate
+   --  the newly created node in the Node_Table itself.
+
+   -----------------------------------
+   -- Print_Class_Wide_Empty_Nodes --
+   -----------------------------------
+
+   procedure Print_Class_Wide_Empty_Nodes (O : in out Output_Record) is
+   begin
+      PL (O, "package " & Empty_Nodes & " is");
+      NL (O);
+
+      Relative_Indent (O, 3);
+
+      for Kind in Valid_Kind'Range loop
+         declare
+            Mixed_Kind_Name : constant String := Mixed_Case_Name (Kind);
+         begin
+            PL (O, Mixed_Kind_Name & "_Node : constant Why_Node :=");
+            PL (O, "  (Kind => " & Mixed_Kind_Name & ", others => <>);");
+         end;
+      end loop;
+
+      Relative_Indent (O, -3);
+
+      NL (O);
+      PL (O, "end " & Empty_Nodes & ";");
+
+      NL (O);
+   end Print_Class_Wide_Empty_Nodes;
+
+   -------------------------------------
+   -- Print_Class_Wide_Builder_Bodies --
+   -------------------------------------
+
+   procedure Print_Class_Wide_Builder_Bodies (O : in out Output_Record) is
+   begin
+      Print_Class_Wide_Empty_Nodes (O);
+
+      for Kind in Valid_Kind'Range loop
+         Print_Builder_Body (O, Kind, Derived,
+                             Id_Subtype (Kind, Derived));
+
+         for CI of Classes loop
+            if Kind in Class_First (CI) .. Class_Last (CI)
+              and then Class_Name (CI) /= "W_Any_Node"
+            then
+               NL (O);
+               Print_Builder_Body (O, Kind, Derived,
+                                   Id_Subtype (Class_Name (CI), Derived));
+            end if;
+         end loop;
+
+         if Kind /= Valid_Kind'Last then
+            NL (O);
+         end if;
+      end loop;
+   end Print_Class_Wide_Builder_Bodies;
+
+end Xtree_Builders;
