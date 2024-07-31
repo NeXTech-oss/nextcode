@@ -1,0 +1,92 @@
+------------------------------------------------------------------------------
+--                                                                          --
+--                            GNAT2WHY COMPONENTS                           --
+--                                                                          --
+--                              O U T P U T S                               --
+--                                                                          --
+--                                 S p e c                                  --
+--                                                                          --
+-------------------------------------------------------------------------------
+--
+-- Copyright (c) 2024, NeXTech Corporation. All rights reserved.
+-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+--
+-- This code is distributed in the hope that it will be useful, but WITHOUT
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+-- version 2 for more details (a copy is included in the LICENSE file that
+-- accompanied this code).
+--
+-- Author(-s): Tunjay Akbarli (tunjayakbarli@it-gss.com)
+--             Tural Ghuliev (turalquliyev@it-gss.com)
+--
+-------------------------------------------------------------------------------
+
+with Ada.Text_IO; use Ada.Text_IO;
+
+package Outputs is
+   --  This package provides some utilities to output indented text
+
+   type Output_Id is (Stderr, Stdout, Current_File);
+   --  Handle on an output. An indentation level is associated to each
+   --  output; this package offers ways to modify this level and to write
+   --  into the corresponding stream.
+
+   procedure Open_Current_File (Filename : String)
+     with Post => Indent_Level (Current_File) = 0;
+   --  Open Filename and set current file's output to the corresponding file
+   --  descriptor.
+
+   procedure Close_Current_File;
+   --  Close current file
+
+   function Indent_Level (O : Output_Id) return Natural with Ghost;
+   --  Returns the current indentation level of O
+
+   procedure Absolute_Indent (O : Output_Id; Level : Natural)
+     with Post => Indent_Level (O) = Level;
+   --  Set the indentation level of O to Level
+
+   procedure Relative_Indent (O : Output_Id; Diff : Integer)
+     with Post => Indent_Level (O) = Indent_Level (O)'Old + Diff;
+   --  Increase the indentation level of O by Level (or decrease it
+   --  if Level is lesser than zero).
+
+   procedure P  (O : Output_Id; C : Character)
+     with Pre => Indent_Level (O) = 0;
+   --  Put C to output O, but can only be used when indentation level is 0
+
+   procedure P  (O : Output_Id; S : String; As_String : Boolean := False);
+   --  Put S to output O, indenting it if need be. If As_String is true, the
+   --  argument string is interpreted as a string literal.
+
+   procedure PL (O : Output_Id; S : String);
+   --  Put_Line S to output O, indenting it if need be
+
+   procedure NL (O : Output_Id);
+   --  Add a new line to output O; no trailing spaces are added
+   --  even if the identation level is greater than zero.
+
+private
+
+   type Output_State is limited record
+      Indent   : Natural := 0;
+      --  Indentation level
+
+      New_Line : Boolean := False;
+      --  Whether or not the last write in File created a new line;
+      --  this is used to know if spaces should be written before
+      --  the next P/PL operation (for indentation).
+   end record;
+
+   Output_States : array (Output_Id) of Output_State;
+
+   Output_Handles : array (Output_Id) of File_Type :=
+     (Stderr       => Standard_Error,
+      Stdout       => Standard_Output,
+      Current_File => <>);
+
+   function Indent_Level (O : Output_Id) return Natural is
+     (Output_States (O).Indent);
+
+end Outputs;
