@@ -1,0 +1,8 @@
+theory Discrete_Base_Theory
+  use export bool.Bool
+
+  type rep_type
+
+  function bool_eq (x : rep_type) (y : rep_type) : bool =
+    if x = y then True else False
+end

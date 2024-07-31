@@ -1,0 +1,2969 @@
+module Main
+  use export "_gnatprove_standard_th".Main_Main
+
+  (* equality over private types *)
+  val function private__bool_eq __private __private : bool
+
+  (* dummy value for the null extension when the dynamic type matches the
+  static type *)
+  val constant __null_ext__ : __private
+
+  (* exception used to simulate return statements *)
+  exception Return__exc
+
+  (* exception used to translate Ada exceptions *)
+  exception Ada__exc int
+
+  (* The type for the heap, and the heap variable. This variable represents
+     all effects that we cannot describe more precisely, and that do not
+     interfere with other variables, i.e., writes through pointers, aliased
+     variables etc. *)
+  type __type_of_heap
+  type __type_of_heap__ref = { mutable __type_of_heap__content [@model_trace:] : __type_of_heap }
+  val __HEAP : __type_of_heap__ref
+
+  (* the return type for the functions that correspond to 'Image *)
+  type __image
+
+  (* Mutable records holding references over builtin types *)
+  type int__ref  = { mutable int__content [@model_trace:]  : int  }
+  type bool__ref = { mutable bool__content [@model_trace:] : bool }
+  type __fixed__ref = { mutable __fixed__content [@model_trace:] : __fixed }
+  type real__ref = { mutable real__content [@model_trace:] : real }
+  type __private__ref = { mutable __private__content [@model_trace:] : __private }
+
+  (* Boolean value to simulate calls to possibly nonreturning procedures *)
+  val no__return : bool__ref
+
+  (* Projections from records holding references over builtin types to builtin types *)
+  function int__ref___projection
+    (a : int__ref)  : int =
+    a.int__content
+  meta "model_projection" function int__ref___projection
+  meta "inline:no" function int__ref___projection
+
+  function __fixed__ref___projection
+    (a : __fixed__ref)  : __fixed =
+    a.__fixed__content
+  meta "model_projection" function __fixed__ref___projection
+  meta "inline:no" function __fixed__ref___projection
+
+  function bool__ref___projection
+    (a : bool__ref)  : bool =
+    a.bool__content
+  meta "model_projection" function bool__ref___projection
+  meta "inline:no" function bool__ref___projection
+
+  function real__ref___projection
+    (a : real__ref)  : real =
+    a.real__content
+  meta "model_projection" function real__ref___projection
+  meta "inline:no" function real__ref___projection
+
+  function __private__ref___projection
+    (a : __private__ref)  : __private =
+    a.__private__content
+  meta "model_projection" function __private__ref___projection
+  meta "inline:no" function __private__ref___projection
+
+  (* Program function that sets the value of its parameter to any possible
+     value allowed by its type. *)
+  val int__havoc (x : int__ref) : unit
+     writes { x }
+  val bool__havoc (x : bool__ref) : unit
+     writes { x }
+  val real__havoc (x : real__ref) : unit
+     writes { x }
+  val __private__havoc (x : __private__ref) : unit
+     writes { x }
+  val __fixed__havoc (x : __fixed__ref) : unit
+     writes { x }
+
+  (* Counterexample branching-if variable. The model_trace is intentionally not
+     a node_id. We use another label to recognize the node_id corresponding to
+     values but we still need to trigger counterexample on this.  *)
+  val spark__branch [@model_trace:0000]: bool__ref
+end
+
+(* Module for the initialization wrapper for the bool type. This mimics the
+   automatically generated initialization modules. Any change in the handling
+   of relaxed initialization should be reflected here. *)
+module Boolean__init_wrapper
+  use bool.Bool
+
+  type boolean__init_wrapper =
+  {
+    rec__value [@model_trace:'Init_Val] : bool;
+     __attr__init [@model_trace:'Initialized] : bool
+   }
+
+  function boolean__init_wrapper_rec__value__projection (a: boolean__init_wrapper) :
+    bool =
+    a.rec__value
+
+  meta "model_projection" function boolean__init_wrapper_rec__value__projection
+
+  meta "inline:no" function boolean__init_wrapper_rec__value__projection
+
+  function boolean__init_wrapper___attr__init__projection (a: boolean__init_wrapper) : bool =
+    __attr__init a
+
+  meta "model_projection" function boolean__init_wrapper___attr__init__projection
+
+  meta "inline:no" function boolean__init_wrapper___attr__init__projection
+
+  function of_wrapper (a: boolean__init_wrapper) : bool =
+    a.rec__value
+
+  val of_wrapper (a: boolean__init_wrapper) : bool
+    ensures { result = of_wrapper a }
+
+  function to_wrapper (x: bool) : boolean__init_wrapper =
+    { rec__value = x ; __attr__init = True }
+
+  val to_wrapper (x: bool) : boolean__init_wrapper
+    ensures { result = to_wrapper x }
+
+  val function dummy : boolean__init_wrapper
+
+  axiom dummy__def: __attr__init dummy = False
+  meta "remove_unused:dependency" axiom dummy__def, function dummy
+
+  type boolean__init_wrapper__ref = {
+                                   mutable boolean__init_wrapper__content :
+                                     boolean__init_wrapper
+                                   }
+
+  function boolean__init_wrapper__ref_boolean__init_wrapper__content__projection (a: boolean__init_wrapper__ref) : boolean__init_wrapper =
+    a.boolean__init_wrapper__content
+
+  meta "model_projection" function boolean__init_wrapper__ref_boolean__init_wrapper__content__projection
+
+  meta "inline:no" function boolean__init_wrapper__ref_boolean__init_wrapper__content__projection
+
+  val boolean__init_wrapper__havoc (x: boolean__init_wrapper__ref) :
+    unit
+    writes { x }
+end
+
+(* Functions reading built-in values from __image *)
+
+module Builtin_from_image
+  use Main
+
+  (* function reading an integer from an image *)
+
+  function int__attr__ATTRIBUTE_VALUE __image : int
+
+  predicate int__attr__ATTRIBUTE_VALUE__pre_check (x : __image)
+
+  val int__attr__ATTRIBUTE_VALUE_ (x : __image) : int
+    requires { int__attr__ATTRIBUTE_VALUE__pre_check x }
+    ensures { result = int__attr__ATTRIBUTE_VALUE x }
+
+  (* function reading a real from an image *)
+
+  function real__attr__ATTRIBUTE_VALUE __image : real
+
+  predicate real__attr__ATTRIBUTE_VALUE__pre_check (x : __image)
+
+  val real__attr__ATTRIBUTE_VALUE_ (x : __image) : real
+    requires { real__attr__ATTRIBUTE_VALUE__pre_check x }
+    ensures {  result = real__attr__ATTRIBUTE_VALUE x }
+
+  (* function reading a real from a quotient image *)
+
+  function real__QUOTIENT_VALUE __image : real
+
+  predicate real__QUOTIENT_VALUE__pre_check (x : __image)
+
+  val real__QUOTIENT_VALUE_ (x : __image) : real
+    requires { real__QUOTIENT_VALUE__pre_check x }
+    ensures  { result = real__QUOTIENT_VALUE x }
+
+end
+
+module Compatible_Tags
+  (* A predicate to check compatibility between tags:
+     __compatible_tags tag1 tag2 means objects of type T1'Class also have type
+     T2'Class. *)
+
+  val predicate __compatible_tags (from_tag : int) (to_tag : int)
+
+  axiom __compatible_tags_refl :
+    forall tag : int. __compatible_tags tag tag
+  (* Objects of type T'Class also have type T'Class *)
+  meta "remove_unused:dependency" axiom __compatible_tags_refl, predicate __compatible_tags
+
+  axiom __compatible_tags_transitive :
+    forall tag1, tag2, tag3 : int.
+      __compatible_tags tag2 tag1 ->
+      __compatible_tags tag3 tag2 ->  __compatible_tags tag3 tag1
+  (* If objects of type T2'Class also have type T1'Class and objects of type
+     T3'Class also have type T2'Class then objects of type T3'Class also have
+     type T1'Class. *)
+  meta "remove_unused:dependency" axiom __compatible_tags_transitive, predicate __compatible_tags
+
+  axiom __compatible_tags_separate_trees :
+    forall tag1, tag2, tag3 : int.
+      not __compatible_tags tag1 tag2 ->
+      not __compatible_tags tag2 tag1 -> __compatible_tags tag3 tag1 ->
+      not __compatible_tags tag3 tag2
+  (* If T1'Class and T2'Class are disjoint, then objects of type T3'Class
+     cannot be in both. *)
+  meta "remove_unused:dependency" axiom __compatible_tags_separate_trees, predicate __compatible_tags
+end
+
+module Integer
+  use export "_gnatprove_standard_th".Integer
+
+  val bool_eq (x y : int) : bool
+  ensures { result = bool_eq x y }
+  val bool_ne (x y : int) : bool
+  ensures { result = bool_ne x y }
+  val bool_lt (x y : int) : bool
+  ensures { result = bool_lt x y }
+  val bool_le (x y : int) : bool
+  ensures { result = bool_le x y }
+  val bool_gt (x y : int) : bool
+  ensures { result = bool_gt x y }
+  val bool_ge (x y : int) : bool
+  ensures { result = bool_ge x y }
+
+  val length (x y : int) : int
+  ensures { result = length x y }
+end
+
+module Int_Gcd
+  use number.Gcd as Gcd
+  use int.Int
+
+  function gcd int int : int
+
+  axiom gcd_pos :
+    forall x, y : int. x > 0 /\ y > 0 -> gcd x y = Gcd.gcd x y
+  meta "remove_unused:dependency" axiom gcd_pos, function gcd
+
+  val gcd_ (x:int) (y:int) : int
+     requires { x <> 0 /\ y <> 0 }
+     ensures { result = gcd x y }
+end
+
+module Int_Power
+  use export int.Power
+end
+
+module Int_Minmax
+  use int.Int
+  use int.MinMax as MinMax
+
+  let function int_max (x y : int) : int = MinMax.max x y
+
+  let function int_min (x y : int) : int = MinMax.min x y
+
+end
+
+module Int_Abs
+  use export int.Abs
+end
+
+module Int_Division
+  use int.Int
+  use int.ComputerDivision as ComputerDivision
+  use int.EuclideanDivision as EuclideanDivision
+
+  (* Ada division and rem operator correspond to what Why3 calls "computer
+  division". Ada mod operator does not correspond to any predefined operator
+  in Why3. *)
+  function div (x y : int) : int = ComputerDivision.div x y
+  val div (x:int) (y:int) : int
+     ensures { result = div x y }
+
+  function rem (x y : int) : int = ComputerDivision.mod x y
+  val rem (x:int) (y:int) : int
+     ensures { result = rem x y }
+
+  (* We express mod via Euclidean mod, as this is what is used in SMT *)
+  function mod (x y : int) : int =
+    if y >= 0 then EuclideanDivision.mod x y
+    else - EuclideanDivision.mod (- x) y
+
+  val mod (x:int) (y:int) : int
+     ensures { result = mod x y }
+
+  (* This function is used for the (implicit) modulo operation on modular
+  types. The modulus is always positive, and in that case, the Ada mod or
+  Euclidean mod are OK. We take the Euclidean one because it is better
+  supported. *)
+  function math_mod (x y : int) : int = EuclideanDivision.mod x y
+  val math_mod (x y:int) : int
+    ensures { result = EuclideanDivision.mod x y }
+
+  (* These program functions are there to generate division checks *)
+
+  val div_ (x:int) (y:int) : int
+     requires { y <> 0 }
+     ensures { result = div x y }
+
+  val rem_ (x:int) (y:int) : int
+     requires { y <> 0 }
+     ensures{ result = rem x y }
+
+  val mod_ (x:int) (y:int) : int
+     requires { y <> 0 }
+     ensures { result = mod x y }
+
+end
+
+module Int_Shift
+  use int.Int
+  use int.Power as Power
+  use int.ComputerDivision as ComputerDivision
+
+  (* Signed to unsigned interpretation of the same bitvector of size bits *)
+  let function to_unsigned (x size : int) : int =
+    if x >= 0 then x else x + Power.power 2 size
+
+  (* Unsigned to signed interpretation of the same bitvector of size bits *)
+  let function to_signed (x size : int) : int =
+    if x < Power.power 2 (size-1) then x else x - Power.power 2 size
+
+  (* Lazy modulus, only applied when x >= m *)
+  let function lazy_mod (x m : int) : int =
+    if x < m then x else ComputerDivision.mod x m
+
+  (* shift_left behavior on signed is the same as:
+     - applying to_unsigned
+     - doing the shift on unsigned value: (uns * 2**n) mod 2**size
+     - applying to_signed
+     We don't apply the mod operation if not needed, in order to
+     improve proof results, as provers tend to be ignorant of mod.
+   *)
+  let function shift_left (x n size : int) : int =
+    let uns = to_unsigned x size in
+    let res = lazy_mod (uns * (Power.power 2 n)) (Power.power 2 size) in
+    to_signed res size
+
+  (* shift_right behavior on signed is the same as:
+     - applying to_unsigned
+     - doing the shift on unsigned value: (uns / 2**n)
+     - applying to_signed
+   *)
+  let function shift_right (x n size : int) : int =
+    let uns = to_unsigned x size in
+    let res = ComputerDivision.div uns (Power.power 2 n) in
+    to_signed res size
+
+  (* shift_right_arithmetic behavior on signed is the same as:
+     - doing the division for the shift: (x / 2**n)
+     - with round down for negative, that is, subtract one if the
+       rest of the division is not null in that case
+     Note: argument 'size' is not used.
+   *)
+  let function shift_right_arithmetic (x n _ : int) : int =
+    if x < 0 then
+      ComputerDivision.div (x + 1) (Power.power 2 n) - 1
+    else
+      ComputerDivision.div x (Power.power 2 n)
+
+  (* rotate_left and rotate_right are left uninterpreted for now *)
+  val function rotate_left (x n size : int) : int
+  val function rotate_right (x n size : int) : int
+
+end
+
+module Real
+  use        real.RealInfix
+  use export "_gnatprove_standard_th".Real
+
+  val bool_eq (x y : real) : bool
+  ensures { result = bool_eq x y }
+  val bool_ne (x y : real) : bool
+  ensures { result = bool_ne x y }
+  val bool_lt (x y : real) : bool
+  ensures { result = bool_lt x y }
+  val bool_le (x y : real) : bool
+  ensures { result = bool_le x y }
+  val bool_gt (x y : real) : bool
+  ensures { result = bool_gt x y }
+  val bool_ge (x y : real) : bool
+  ensures { result = bool_ge x y }
+
+  (* Division operators with no preconditions, to use when no checks are
+   * necessary. *)
+
+  function div (x y:real) : real = x /. y
+
+  val div (x y:real) : real
+    ensures  { y <> 0.0 -> result = div x y }
+end
+
+module Real_Power
+  use export real.PowerInt
+  val power (x : real) (n : int) : real
+  ensures { result = power x n }
+end
+
+module Real_Minmax
+  use real.RealInfix
+  use export real.MinMax
+
+  let min (x y : real) : real
+    ensures { result = min x y }
+  = if x <=. y then x else y
+
+  let max (x y : real) : real
+    ensures { result = max x y }
+   = if x <=. y then y else x
+
+end
+
+module Real_FromInt
+  use export real.FromInt
+
+  val from_int (x : int) : real
+    ensures { result = from_int x }
+
+end
+
+module Real_Abs
+  use export real.Abs
+  val abs (x : real) : real
+  ensures { result = abs x }
+end
+
+module Floating_power
+  (* Ada's exponentiation operator "**" axiomatization:
+
+     As said in the Ada RM (sec 4.5.6), "X**N" can be equal to any one of the
+     possible factorizations of the exponentiation: "multiplications are
+     associated in an arbitrary order". Also, it is guaranteed that for "N"
+     negative "the result is the reciprocal of the result using the absolute
+     value of "N"". Hence, since multiplication on floats is commutative but
+     not associative, we can only be sure of the value of "X**N" for "N"
+     between -3 and 3. *)
+
+  type t
+
+  use int.Int
+  predicate is_finite t
+  predicate is_zero t
+  predicate eq t t
+
+  function of_int int : t
+  function ( * ) t t   : t
+  function div   t t   : t
+  val function power t int : t
+
+  axiom Power_0 : forall x: t. is_finite x -> eq (power x 0) (of_int 1)
+  meta "remove_unused:dependency" axiom Power_0, function power
+
+  lemma Power_1 : forall x : t. is_finite x -> eq (power x 1) x
+  meta "remove_unused:dependency" lemma Power_1, function power
+
+  axiom Power_2 : forall x : t. is_finite x -> eq (power x 2) (x * x)
+  meta "remove_unused:dependency" axiom Power_2, function power
+
+  axiom Power_3 : forall x : t. is_finite x -> eq (power x 3) (x * (x * x))
+  meta "remove_unused:dependency" axiom Power_3, function power
+
+  axiom Power_neg1 : forall x : t. is_finite x -> not (is_zero x) ->
+    eq (power x (-1)) (div (of_int 1) x)
+  meta "remove_unused:dependency" axiom Power_neg1, function power
+
+  axiom Power_neg2 : forall x : t. is_finite x -> not (is_zero x) ->
+    eq (power x (-2)) (div (of_int 1) (power x 2))
+  meta "remove_unused:dependency" axiom Power_neg2, function power
+
+  axiom Power_neg3 : forall x : t. is_finite x -> not (is_zero x) ->
+    eq (power x (-2)) (div (of_int 1) (power x 3))
+  meta "remove_unused:dependency" axiom Power_neg3, function power
+end
+
+module Floating_next_prev
+  (* next/prev representable:
+     Next and previous representable reals. The functions return respectively
+     the representable real greater than or lower than the argument x, which
+     may or not be representable. *)
+
+  type t
+
+  constant max_value : t
+  function neg t : t
+
+  predicate is_finite t
+  predicate eq t t
+  predicate lt t t
+  predicate le t t
+  predicate gt t t
+  predicate ge t t
+
+  val function next_representable (x : t) : t
+  val function prev_representable (x : t) : t
+
+  (* Note that Succ (-0) > +0 *)
+
+  (* need to guard with is_finite since the axiom cannot hold when x is NaN *)
+  axiom next_representable_def :
+    forall x : t [next_representable x]. is_finite x -> gt (next_representable x) x
+  meta "remove_unused:dependency" axiom next_representable_def, function next_representable
+
+  axiom prev_representable_def :
+    forall x : t [prev_representable x]. is_finite x -> lt (prev_representable x) x
+  meta "remove_unused:dependency" axiom prev_representable_def, function prev_representable
+
+  (* does not need is finite since gt y x implies that neither x or y is NaN *)
+  axiom next_representable_def2 :
+    forall x y : t. gt y x -> ge y (next_representable x)
+  meta "remove_unused:dependency" axiom next_representable_def2, function next_representable
+
+  axiom prev_representable_def2 :
+    forall x y : t. lt y x -> le y (prev_representable x)
+  meta "remove_unused:dependency" axiom prev_representable_def2, function prev_representable
+
+  (* possible addition: *)
+
+  (* axiom next_representable_gt :
+    forall x y z : t. gt y x -> gt z y -> gt z (next_representable x)
+    meta "remove_unused:dependency" axiom next_representable_gt, function next_representable
+
+    and idem for prev.
+  *)
+
+  axiom next_representable_finite :
+    forall x : t [is_finite (next_representable x)].
+      is_finite x -> not (eq x max_value) -> is_finite (next_representable x)
+  meta "remove_unused:dependency" axiom next_representable_finite, function next_representable
+
+  axiom prev_representable_finite :
+    forall x : t [is_finite (prev_representable x)].
+      is_finite x -> not (eq x (neg max_value)) -> is_finite (prev_representable x)
+  meta "remove_unused:dependency" axiom prev_representable_finite, function prev_representable
+end
+
+module Floating_operations
+  (* Elementary functions on floating point types *)
+
+  type t
+  predicate is_finite t
+  predicate is_zero t
+  predicate is_one t
+  predicate is_ge_zero t
+  predicate is_gt_zero t
+  predicate is_ge_one t
+  predicate abs_le_one t
+  predicate abs_ge_one t
+  predicate abs_lt_one t
+  predicate abs_gt_one t
+
+  val function ada_sqrt (x : t) : t
+  axiom ada_sqrt_pos:
+    forall x : t. is_ge_zero (ada_sqrt x)
+  meta "remove_unused:dependency" axiom ada_sqrt_pos, function ada_sqrt
+  axiom ada_sqrt_zero:
+    forall x : t. is_zero x -> is_zero (ada_sqrt x)
+  meta "remove_unused:dependency" axiom ada_sqrt_zero, function ada_sqrt
+  axiom ada_sqrt_non_zero:
+    forall x : t. is_gt_zero x -> is_gt_zero (ada_sqrt x)
+  meta "remove_unused:dependency" axiom ada_sqrt_non_zero, function ada_sqrt
+  axiom ada_sqrt_one:
+    forall x : t. is_one x -> is_one (ada_sqrt x)
+  meta "remove_unused:dependency" axiom ada_sqrt_one, function ada_sqrt
+  axiom ada_sqrt_finite :
+    forall x : t [is_finite (ada_sqrt x)].
+      is_finite x -> is_finite (ada_sqrt x)
+  meta "remove_unused:dependency" axiom ada_sqrt_finite, function ada_sqrt
+  val ada_sqrt_ (x : t) : t
+    requires { is_ge_zero x }
+    ensures  { result = ada_sqrt x }
+
+  val function ada_power (x : t) (y : t) : t
+  predicate ada_power_no_overflow (x : t) (y : t)
+  (* This predicate stands for the fact that abs x is not too big
+     if y is positive, not too close to 0 otherwise. *)
+  axiom ada_power_pos:
+    forall x y : t. is_ge_zero (ada_power x y)
+  meta "remove_unused:dependency" axiom ada_power_pos, function ada_power
+  axiom ada_power_right_zero:
+    forall x y : t. is_zero y -> not (is_zero x) -> is_one (ada_power x y)
+  meta "remove_unused:dependency" axiom ada_power_right_zero, function ada_power
+  axiom ada_power_right_one:
+    forall x y : t. is_one y -> is_ge_zero x -> ada_power x y = x
+  meta "remove_unused:dependency" axiom ada_power_right_one, function ada_power
+  axiom ada_power_left_zero:
+    forall x y : t. is_zero x -> not (is_zero y) -> is_zero (ada_power x y)
+  meta "remove_unused:dependency" axiom ada_power_left_zero, function ada_power
+  axiom ada_power_left_one:
+    forall x y : t. is_one x -> is_one (ada_power x y)
+  meta "remove_unused:dependency" axiom ada_power_left_one, function ada_power
+  axiom ada_power_finite :
+    forall x y : t [is_finite (ada_power x y)].
+      (not (is_zero x) \/ is_gt_zero y) /\ is_ge_zero x
+        /\ ada_power_no_overflow x y ->
+	is_finite (ada_power x y)
+  meta "remove_unused:dependency" axiom ada_power_finite, function ada_power
+  val ada_power_ (x : t) (y : t) : t
+    requires { (not (is_zero x) \/ is_gt_zero y) /\ is_ge_zero x
+		/\ ada_power_no_overflow x y }
+    ensures  { result = ada_power x y }
+
+  val function log (x : t) : t
+  predicate log_no_overflow (x : t)
+  (* This predicate stands for the fact that x is not too close to 0 *)
+  axiom log_one:
+    forall x : t. is_one x -> is_zero (log x)
+  meta "remove_unused:dependency" axiom log_one, function log
+  axiom log_finite :
+    forall x : t [is_finite (log x)].
+      is_gt_zero x /\ log_no_overflow x -> is_finite (log x)
+  meta "remove_unused:dependency" axiom log_finite, function log
+  val log_ (x : t) : t
+    requires { is_gt_zero x /\ log_no_overflow x }
+    ensures  { result = log x }
+
+  val function log_base (x : t) (b : t) : t
+  predicate log_base_no_overflow (x : t) (b : t)
+  (* This predicate stands for the fact that x is not too close to 0 *)
+  axiom log_base_one:
+    forall x b : t. is_one x -> is_zero (log_base x b)
+  meta "remove_unused:dependency" axiom log_base_one, function log_base
+  axiom log_base_finite :
+    forall x b : t [is_finite (log_base x b)].
+       is_finite b -> is_gt_zero x /\ is_gt_zero b /\ not (is_one b)
+         /\ log_base_no_overflow x b -> is_finite (log_base x b)
+  meta "remove_unused:dependency" axiom log_base_finite, function log_base
+  val log_base_ (x : t) (b : t) : t
+    requires { is_gt_zero x /\ is_gt_zero b /\ not (is_one b)
+               /\ log_base_no_overflow x b}
+    ensures  { result = log_base x b }
+
+  val function exp (x : t) : t
+  predicate exp_no_overflow (x : t)
+  (* This predicate stands for the fact that x is not too big *)
+  axiom exp_zero:
+    forall x : t. is_zero x -> is_one (exp x)
+  meta "remove_unused:dependency" axiom exp_zero, function exp
+  axiom exp_finite :
+    forall x : t [is_finite (exp x)].
+      exp_no_overflow x -> is_finite (exp x)
+  meta "remove_unused:dependency" axiom exp_finite, function exp
+  val exp_ (x : t) : t
+    requires { exp_no_overflow x }
+    ensures  { result = exp x }
+
+  val function sin (x : t) : t
+  axiom sin_range:
+    forall x : t. abs_le_one (sin x)
+  meta "remove_unused:dependency" axiom sin_range, function sin
+  axiom sin_zero:
+    forall x : t. is_zero x -> is_zero (sin x)
+  meta "remove_unused:dependency" axiom sin_zero, function sin
+  axiom sin_finite :
+    forall x : t [is_finite (sin x)].
+      is_finite x -> is_finite (sin x)
+  meta "remove_unused:dependency" axiom sin_finite, function sin
+  val sin_ (x : t) : t
+    ensures  { result = sin x }
+
+  val function sin_2 (x : t) (c : t) : t
+  axiom sin_2_range:
+    forall x c : t. abs_le_one (sin_2 x c)
+  meta "remove_unused:dependency" axiom sin_2_range, function sin_2
+  axiom sin_2_zero:
+    forall x c : t. is_zero x -> is_zero (sin_2 x c)
+  meta "remove_unused:dependency" axiom sin_2_zero, function sin_2
+  axiom sin_2_finite :
+    forall x c : t [is_finite (sin_2 x c)].
+      is_finite x /\ is_finite c -> is_gt_zero c -> is_finite (sin_2 x c)
+  meta "remove_unused:dependency" axiom sin_2_finite, function sin_2
+  val sin_2_ (x : t) (c : t) : t
+    requires { is_gt_zero c }
+    ensures  { result = sin_2 x c }
+
+  val function cos (x : t) : t
+  axiom cos_range:
+    forall x : t. abs_le_one (cos x)
+  meta "remove_unused:dependency" axiom cos_range, function cos
+  axiom cos_zero:
+    forall x : t. is_zero x -> is_one (cos x)
+  meta "remove_unused:dependency" axiom cos_zero, function cos
+  axiom cos_finite :
+    forall x : t [is_finite (cos x)].
+      is_finite x -> is_finite (cos x)
+  meta "remove_unused:dependency" axiom cos_finite, function cos
+  val cos_ (x : t) : t
+    ensures  { result = cos x }
+
+  function cos_2 (x : t) (c : t) : t
+  axiom cos_2_range:
+    forall x c : t. abs_le_one (cos_2 x c)
+  meta "remove_unused:dependency" axiom cos_2_range, function cos_2
+  axiom cos_2_zero:
+    forall x c : t. is_zero x -> is_one (cos_2 x c)
+  meta "remove_unused:dependency" axiom cos_2_zero, function cos_2
+  axiom cos_2_finite :
+    forall x c : t [is_finite (cos_2 x c)].
+      is_finite x /\ is_finite c -> is_gt_zero c -> is_finite (cos_2 x c)
+  meta "remove_unused:dependency" axiom cos_2_finite, function cos_2
+  val cos_2_ (x : t) (c : t) : t
+    requires { is_gt_zero c }
+    ensures  { result = cos_2 x c }
+
+  val function tan (x : t) : t
+  predicate tan_no_overflow (x : t)
+  (* This predicate stands for the fact that x is not to close to
+     Pi/2 + k * Pi *)
+  axiom tan_zero:
+    forall x : t. is_zero x -> is_zero (tan x)
+  meta "remove_unused:dependency" axiom tan_zero, function tan
+  axiom tan_finite :
+    forall x : t [is_finite (tan x)].
+      tan_no_overflow x -> is_finite (tan x)
+  meta "remove_unused:dependency" axiom tan_finite, function tan
+  val tan_ (x : t) : t
+    requires { tan_no_overflow x }
+    ensures  { result = tan x }
+
+  val function tan_2 (x : t) (c : t) : t
+  predicate tan_2_no_overflow (x : t) (c : t)
+  (* This predicate stands for the fact that x mod c is not too close to
+     c/4 or - c/4 *)
+  axiom tan_2_zero:
+    forall x c : t. is_zero x -> is_zero (tan_2 x c)
+  meta "remove_unused:dependency" axiom tan_2_zero, function tan_2
+  axiom tan_2_finite :
+    forall x c : t [is_finite (tan_2 x c)].
+       is_finite c /\ is_gt_zero c /\ tan_2_no_overflow x c ->
+       is_finite (tan_2 x c)
+  meta "remove_unused:dependency" axiom tan_2_finite, function tan_2
+  val tan_2_ (x : t) (c : t) : t
+    requires { is_gt_zero c /\ tan_2_no_overflow x c }
+    ensures  { result = tan_2 x c }
+
+  val function cot (x : t) : t
+  predicate cot_no_overflow (x : t)
+  (* This predicate stands for the fact that x is not too close to a
+     multiple of Pi *)
+  axiom cot_finite :
+    forall x : t [is_finite (cot x)].
+      cot_no_overflow x -> is_finite (cot x)
+  meta "remove_unused:dependency" axiom cot_finite, function cot
+  val cot_ (x : t) : t
+    requires { not (is_zero x) /\ cot_no_overflow x }
+    ensures  { result = cot x }
+
+  val function cot_2 (x : t) (c : t) : t
+  predicate cot_2_no_overflow (x : t) (c : t)
+  (* This predicate stands for the fact that x mod c is not too close to
+     0 or c/2 *)
+  axiom cot_2_finite :
+    forall x c : t [is_finite (cot_2 x c)].
+       is_finite c /\ is_gt_zero c /\ cot_2_no_overflow x c ->
+       is_finite (cot_2 x c)
+  meta "remove_unused:dependency" axiom cot_2_finite, function cot_2
+  val cot_2_ (x : t) (c : t) : t
+    requires { is_gt_zero c /\ not (is_zero x) /\ cot_2_no_overflow x c }
+    ensures  { result = cot_2 x c }
+
+  val function arcsin (x : t) : t
+  axiom arcsin_zero:
+    forall x : t. is_zero x -> is_zero (arcsin x)
+  meta "remove_unused:dependency" axiom arcsin_zero, function arcsin
+  axiom arcsin_finite :
+    forall x : t [is_finite (arcsin x)].
+      abs_le_one x -> is_finite (arcsin x)
+  meta "remove_unused:dependency" axiom arcsin_finite, function arcsin
+  val arcsin_ (x : t) : t
+    requires { abs_le_one x }
+    ensures  { result = arcsin x }
+
+  val function arcsin_2 (x : t) (c : t) : t
+  axiom arcsin_2_zero:
+    forall x c : t. is_zero x -> is_zero (arcsin_2 x c)
+  meta "remove_unused:dependency" axiom arcsin_2_zero, function arcsin_2
+  axiom arcsin_2_finite :
+    forall x c : t [is_finite (arcsin_2 x c)].
+      is_finite c /\ is_gt_zero c /\ abs_le_one x -> is_finite (arcsin_2 x c)
+  meta "remove_unused:dependency" axiom arcsin_2_finite, function arcsin_2
+  val arcsin_2_ (x : t) (c : t) : t
+    requires { is_gt_zero c /\ abs_le_one x }
+    ensures  { result = arcsin_2 x c }
+
+  val function arccos (x : t) : t
+  axiom arccos_zero:
+    forall x : t. is_one x -> is_zero (arccos x)
+  meta "remove_unused:dependency" axiom arccos_zero, function arccos
+  axiom arccos_finite :
+    forall x : t [is_finite (arccos x)].
+      abs_le_one x -> is_finite (arccos x)
+  meta "remove_unused:dependency" axiom arccos_finite, function arccos
+  val arccos_ (x : t) : t
+    requires { abs_le_one x }
+    ensures  { result = arccos x }
+
+  val function arccos_2 (x : t) (c : t) : t
+  axiom arccos_2_zero:
+    forall x c : t. is_one x -> is_zero (arccos_2 x c)
+  meta "remove_unused:dependency" axiom arccos_2_zero, function arccos_2
+  axiom arccos_2_finite :
+    forall x c : t [is_finite (arccos_2 x c)].
+      is_finite c /\ is_gt_zero c /\ abs_le_one x -> is_finite (arccos_2 x c)
+  meta "remove_unused:dependency" axiom arccos_2_finite, function arccos_2
+  val arccos_2_ (x : t) (c : t) : t
+    requires { is_gt_zero c /\ abs_le_one x }
+    ensures  { result = arccos_2 x c }
+
+  val function arctan (y : t) (x : t) : t
+  axiom arctan_zero:
+    forall x y : t. is_gt_zero x -> is_zero y -> is_zero (arctan y x)
+  meta "remove_unused:dependency" axiom arctan_zero, function arctan
+  axiom arctan_finite :
+    forall x y : t [is_finite (arctan y x)].
+      not is_zero x \/ not is_zero y -> is_finite x -> is_finite y ->
+      is_finite (arctan y x)
+  meta "remove_unused:dependency" axiom arctan_finite, function arctan
+  val arctan_ (y : t) (x : t) : t
+    requires { not is_zero x \/ not is_zero y }
+    ensures  { result = arctan y x }
+
+  val function arctan_2 (y : t) (x : t) (c : t) : t
+  axiom arctan_2_zero:
+    forall x y c : t. is_gt_zero x -> is_zero y -> is_zero (arctan_2 y x c)
+  meta "remove_unused:dependency" axiom arctan_2_zero, function arctan_2
+  axiom arctan_2_finite :
+    forall x y c : t [is_finite (arctan_2 y x c)].
+      is_finite c /\ is_gt_zero c -> (not is_zero x \/ not is_zero y) ->
+      is_finite x -> is_finite y -> is_finite (arctan_2 y x c)
+  meta "remove_unused:dependency" axiom arctan_2_finite, function arctan_2
+  val arctan_2_ (y : t) (x : t) (c : t) : t
+    requires { is_gt_zero c /\ (not is_zero x \/ not is_zero y) }
+    ensures  { result = arctan_2 y x c }
+
+  val function arccot (x : t) (y : t) : t
+  axiom arccot_zero:
+    forall x y : t. is_gt_zero x -> is_zero y -> is_zero (arccot x y)
+  meta "remove_unused:dependency" axiom arccot_zero, function arccot
+  axiom arccot_finite :
+    forall x y : t [is_finite (arccot x y)].
+      not is_zero x \/ not is_zero y -> is_finite x -> is_finite y ->
+      is_finite (arccot x y)
+  meta "remove_unused:dependency" axiom arccot_finite, function arccot
+  val arccot_ (x : t) (y : t) : t
+    requires { not is_zero x \/ not is_zero y }
+    ensures  { result = arccot x y }
+
+  val function arccot_2 (x : t) (y : t) (c : t) : t
+  axiom arccot_2_zero:
+    forall x y c : t. is_gt_zero x -> is_zero y -> is_zero (arccot_2 x y c)
+  meta "remove_unused:dependency" axiom arccot_2_zero, function arccot_2
+  axiom arccot_2_finite :
+    forall x y c : t [is_finite (arccot_2 x y c)].
+      is_finite c /\ is_gt_zero c -> (not is_zero x \/ not is_zero y) ->
+      is_finite x -> is_finite y -> is_finite (arccot_2 x y c)
+  meta "remove_unused:dependency" axiom arccot_2_finite, function arccot_2
+  val arccot_2_ (x : t) (y : t) (c : t) : t
+    requires { is_gt_zero c /\ (not is_zero x \/ not is_zero y) }
+    ensures  { result = arccot_2 x y c }
+
+  val function sinh (x : t) : t
+  predicate sinh_no_overflow (x : t)
+  (* This predicate stands for the fact that abs x is not too big. *)
+  axiom sinh_zero_no_overflow:
+    forall x : t. is_zero x -> sinh_no_overflow x
+  meta "remove_unused:dependency" axiom sinh_zero_no_overflow, predicate sinh_no_overflow
+  axiom sinh_zero:
+    forall x : t. is_zero x -> is_zero (sinh x)
+  meta "remove_unused:dependency" axiom sinh_zero, function sinh
+  axiom sinh_finite :
+    forall x : t [is_finite (sinh x)].
+      sinh_no_overflow x -> is_finite (sinh x)
+  meta "remove_unused:dependency" axiom sinh_finite, function sinh
+  val sinh_ (x : t) : t
+    requires { sinh_no_overflow x }
+    ensures  { result = sinh x }
+
+  val function cosh (x : t) : t
+  predicate cosh_no_overflow (x : t)
+  (* This predicate stands for the fact that abs x is not too big. *)
+  axiom cosh_zero_no_overflow:
+    forall x : t. is_zero x -> cosh_no_overflow x
+  meta "remove_unused:dependency" axiom cosh_zero_no_overflow, predicate cosh_no_overflow
+  axiom cosh_range:
+    forall x : t. is_ge_one (cosh x)
+  meta "remove_unused:dependency" axiom cosh_range, function cosh
+  axiom cosh_zero:
+    forall x : t. is_zero x -> is_one (cosh x)
+  meta "remove_unused:dependency" axiom cosh_zero, function cosh
+  axiom cosh_finite :
+    forall x : t [is_finite (cosh x)].
+      cosh_no_overflow x -> is_finite (cosh x)
+  meta "remove_unused:dependency" axiom cosh_finite, function cosh
+  val cosh_ (x : t) : t
+    requires { cosh_no_overflow x }
+    ensures  { result = cosh x }
+
+  val function tanh (x : t) : t
+  axiom tanh_range:
+    forall x : t. abs_le_one (tanh x)
+  meta "remove_unused:dependency" axiom tanh_range, function tanh
+  axiom tanh_zero:
+    forall x : t. is_zero x -> is_zero (tanh x)
+  meta "remove_unused:dependency" axiom tanh_zero, function tanh
+  axiom tanh_finite :
+    forall x : t [is_finite (tanh x)].
+      is_finite x -> is_finite (tanh x)
+  meta "remove_unused:dependency" axiom tanh_finite, function tanh
+  val tanh_ (x : t) : t
+    ensures  { result = tanh x }
+
+  val function coth (x : t) : t
+  predicate coth_no_overflow (x : t)
+  (* This predicate stands for the fact that x is not too close to 0. *)
+  axiom coth_range:
+    forall x : t. abs_ge_one (coth x)
+  meta "remove_unused:dependency" axiom coth_range, function coth
+  axiom coth_finite :
+    forall x : t [is_finite (coth x)].
+      not (is_zero x) /\ coth_no_overflow x -> is_finite (coth x)
+  meta "remove_unused:dependency" axiom coth_finite, function coth
+  val coth_ (x : t) : t
+    requires { not (is_zero x) /\ coth_no_overflow x }
+    ensures  { result = coth x }
+
+  val function arcsinh (x : t) : t
+  axiom arcsinh_zero:
+    forall x : t. is_zero x -> is_zero (arcsinh x)
+  meta "remove_unused:dependency" axiom arcsinh_zero, function arcsinh
+  axiom arcsinh_finite :
+    forall x : t [is_finite (arcsinh x)].
+      is_finite x -> is_finite (arcsinh x)
+  meta "remove_unused:dependency" axiom arcsinh_finite, function arcsinh
+  val arcsinh_ (x : t) : t
+    ensures  { result = arcsinh x }
+
+  val function arccosh (x : t) : t
+  axiom arccosh_pos:
+    forall x : t. is_ge_zero (arccosh (x))
+  meta "remove_unused:dependency" axiom arccosh_pos, function arccosh
+  axiom arccosh_one:
+    forall x : t. is_one x -> is_zero (arccosh x)
+  meta "remove_unused:dependency" axiom arccosh_one, function arccosh
+  axiom arccosh_finite :
+    forall x : t [is_finite (arccosh x)].
+      is_finite x /\ is_ge_one x -> is_finite (arccosh x)
+  meta "remove_unused:dependency" axiom arccosh_finite, function arccosh
+  val arccosh_ (x : t) : t
+    requires { is_ge_one x }
+    ensures  { result = arccosh x }
+
+  val function arctanh (x : t) : t
+  predicate arctanh_no_overflow (x : t)
+  (* This predicate stands for the fact that x is not too close to 1 or -1. *)
+  axiom arctanh_zero_overflow:
+    forall x : t. is_zero x -> arctanh_no_overflow x
+  meta "remove_unused:dependency" axiom arctanh_zero_overflow, predicate arctanh_no_overflow
+  axiom arctanh_zero:
+    forall x : t. is_zero x -> is_zero (arctanh x)
+  meta "remove_unused:dependency" axiom arctanh_zero, function arctanh
+  axiom arctanh_finite :
+    forall x : t [is_finite (arctanh x)].
+      abs_lt_one x /\ arctanh_no_overflow x -> is_finite (arctanh x)
+  meta "remove_unused:dependency" axiom arctanh_finite, function arctanh
+  val arctanh_ (x : t) : t
+    requires { abs_lt_one x /\ arctanh_no_overflow x }
+    ensures  { result = arctanh x }
+
+  val function arccoth (x : t) : t
+  predicate arccoth_no_overflow (x : t)
+  (* This predicate stands for the fact that x is not too close to 1 or -1. *)
+  axiom arccoth_finite :
+    forall x : t [is_finite (arccoth x)].
+      abs_gt_one x /\ arccoth_no_overflow x -> is_finite (arccoth x)
+  meta "remove_unused:dependency" axiom arccoth_finite, function arccoth
+  val arccoth_ (x : t) : t
+    requires { abs_gt_one x /\ arccoth_no_overflow x }
+    ensures  { result = arccoth x }
+end
+
+module Floating
+  clone export _gnatprove_standard_th.Floating_Func
+
+  predicate is_zero t
+  predicate is_positive t
+  function div_rne t t : t
+  function sqrt_rne t : t
+  function rem t t : t
+
+  val sqrt_rne_ (x:t) : t
+     requires { is_zero x \/ is_positive x }
+     ensures { result = sqrt_rne x }
+
+  val div_rne_ (x:t) (y:t) : t
+     requires { not (is_zero y) }
+     ensures { result = div_rne x y }
+
+  val rem_ (x:t) (y:t) : t
+     requires { not (is_zero y) }
+     ensures { result = rem x y }
+
+  val neq (x : t) (y : t) : bool
+   ensures { result <-> neq x y }
+end
+
+module Float32RNE
+  use export ieee_float.Float32
+
+  function mul_rne (x y : t) : t = mul RNE x y
+  function div_rne (x y : t) : t = div RNE x y
+  function add_rne (x y : t) : t = add RNE x y
+  function sub_rne (x y : t) : t = sub RNE x y
+
+  function sqrt_rne (x : t) : t = sqrt RNE x
+
+  function of_int_rne (x:int) : t = of_int RNE x
+  function to_int_rna (x:t) : int = to_int RNA x
+
+  function ceil     (x:t) : t = roundToIntegral RTP x
+  function floor    (x:t) : t = roundToIntegral RTN x
+  function rounding (x:t) : t = roundToIntegral RNA x
+  function truncate (x:t) : t = roundToIntegral RTZ x
+
+  val mul_rne (x y : t) : t
+    ensures { result = mul RNE x y }
+  val div_rne (x y : t) : t
+    ensures { result = div RNE x y }
+  val add_rne (x y : t) : t
+    ensures { result = add RNE x y }
+  val sub_rne (x y : t) : t
+    ensures { result = sub RNE x y }
+
+  val sqrt_rne (x : t) : t
+    ensures { result = sqrt RNE x }
+
+  val of_int_rne (x:int) : t
+    ensures { result = of_int RNE x }
+  val to_int_rna (x:t) : int
+    ensures { result = to_int RNA x }
+
+  val ceil     (x:t) : t
+    ensures { result = roundToIntegral RTP x }
+  val floor    (x:t) : t
+    ensures { result = roundToIntegral RTN x }
+  val rounding (x:t) : t
+    ensures { result = roundToIntegral RNA x }
+  val truncate (x:t) : t
+    ensures { result = roundToIntegral RTZ x }
+
+  val min (x:t) (y:t) : t
+     ensures { result = min x y }
+  val max (x:t) (y:t) : t
+     ensures { result = max x y }
+
+  val constant _zeroF : t
+    ensures { result = zeroF }
+
+  function to_real (x : t) : real = t'real x
+  val to_real (x:t) : real
+    ensures { result = t'real x }
+
+  function copy_sign (x : t) (y : t) : t =
+    if same_sign x y then x else neg x
+  val copy_sign (x : t) (y : t) : t
+    ensures { result = (if same_sign x y then x else neg x) }
+
+end
+
+module Float64RNE
+  use export ieee_float.Float64
+
+  function mul_rne (x y : t) : t = mul RNE x y
+  function div_rne (x y : t) : t = div RNE x y
+  function add_rne (x y : t) : t = add RNE x y
+  function sub_rne (x y : t) : t = sub RNE x y
+
+  function sqrt_rne (x : t) : t = sqrt RNE x
+
+  function of_int_rne (x:int) : t = of_int RNE x
+  function to_int_rna (x:t) : int = to_int RNA x
+
+  function ceil     (x:t) : t = roundToIntegral RTP x
+  function floor    (x:t) : t = roundToIntegral RTN x
+  function rounding (x:t) : t = roundToIntegral RNA x
+  function truncate (x:t) : t = roundToIntegral RTZ x
+
+  val mul_rne (x y : t) : t
+    ensures { result = mul RNE x y }
+  val div_rne (x y : t) : t
+    ensures { result = div RNE x y }
+  val add_rne (x y : t) : t
+    ensures { result = add RNE x y }
+  val sub_rne (x y : t) : t
+    ensures { result = sub RNE x y }
+
+  val sqrt_rne (x : t) : t
+    ensures { result = sqrt RNE x }
+
+  val of_int_rne (x:int) : t
+    ensures { result = of_int RNE x }
+  val to_int_rna (x:t) : int
+    ensures { result = to_int RNA x }
+
+  val ceil     (x:t) : t
+    ensures { result = roundToIntegral RTP x }
+  val floor    (x:t) : t
+    ensures { result = roundToIntegral RTN x }
+  val rounding (x:t) : t
+    ensures { result = roundToIntegral RNA x }
+  val truncate (x:t) : t
+    ensures { result = roundToIntegral RTZ x }
+
+  val min (x:t) (y:t) : t
+     ensures { result = min x y }
+  val max (x:t) (y:t) : t
+     ensures { result = max x y }
+
+  val constant _zeroF : t
+    ensures { result = zeroF }
+
+  function to_real (x : t) : real = t'real x
+  val to_real (x:t) : real
+    ensures { result = t'real x }
+end
+
+module Float80RNE
+  use export ieee_float.Float80
+
+  function mul_rne (x y : t) : t = mul RNE x y
+  function div_rne (x y : t) : t = div RNE x y
+  function add_rne (x y : t) : t = add RNE x y
+  function sub_rne (x y : t) : t = sub RNE x y
+
+  function sqrt_rne (x : t) : t = sqrt RNE x
+
+  function of_int_rne (x:int) : t = of_int RNE x
+  function to_int_rna (x:t) : int = to_int RNA x
+
+  function ceil     (x:t) : t = roundToIntegral RTP x
+  function floor    (x:t) : t = roundToIntegral RTN x
+  function rounding (x:t) : t = roundToIntegral RNA x
+  function truncate (x:t) : t = roundToIntegral RTZ x
+
+  val mul_rne (x y : t) : t
+    ensures { result = mul RNE x y }
+  val div_rne (x y : t) : t
+    ensures { result = div RNE x y }
+  val add_rne (x y : t) : t
+    ensures { result = add RNE x y }
+  val sub_rne (x y : t) : t
+    ensures { result = sub RNE x y }
+
+  val sqrt_rne (x : t) : t
+    ensures { result = sqrt RNE x }
+
+  val of_int_rne (x:int) : t
+    ensures { result = of_int RNE x }
+  val to_int_rna (x:t) : int
+    ensures { result = to_int RNA x }
+
+  val ceil     (x:t) : t
+    ensures { result = roundToIntegral RTP x }
+  val floor    (x:t) : t
+    ensures { result = roundToIntegral RTN x }
+  val rounding (x:t) : t
+    ensures { result = roundToIntegral RNA x }
+  val truncate (x:t) : t
+    ensures { result = roundToIntegral RTZ x }
+
+  val min (x:t) (y:t) : t
+     ensures { result = min x y }
+  val max (x:t) (y:t) : t
+     ensures { result = max x y }
+
+  val constant _zeroF : t
+    ensures { result = zeroF }
+
+  function to_real (x : t) : real = t'real x
+  val to_real (x:t) : real
+    ensures { result = t'real x }
+end
+
+module Float32_power
+  use export Float32RNE
+
+  clone export Floating_power with
+    type t = t,
+    function ( * ) = mul_rne,
+    function div = div_rne,
+    function of_int = of_int_rne,
+    predicate eq = eq,
+    predicate is_finite = t'isFinite,
+    predicate is_zero = is_zero
+end
+
+module Float64_power
+  use export Float64RNE
+
+  clone export Floating_power with
+    type t = t,
+    function ( * ) = mul_rne,
+    function div = div_rne,
+    function of_int = of_int_rne,
+    predicate eq = eq,
+    predicate is_finite = t'isFinite,
+    predicate is_zero = is_zero
+end
+
+module Float80_power
+  use export Float80RNE
+
+  clone export Floating_power with
+    type t = t,
+    function ( * ) = mul_rne,
+    function div = div_rne,
+    function of_int = of_int_rne,
+    predicate eq = eq,
+    predicate is_finite = t'isFinite,
+    predicate is_zero = is_zero
+end
+
+module Float32_next_prev
+  use export Float32RNE
+
+  constant max_value : t
+  axiom max_value : max_real = t'real max_value
+  meta "remove_unused:dependency" axiom max_value, function max_real
+
+  clone export Floating_next_prev with
+    type t = t,
+    function max_value = max_value,
+    function neg = neg,
+    predicate eq = eq,
+    predicate is_finite = t'isFinite,
+    predicate lt = lt,
+    predicate gt = gt,
+    predicate le = le,
+    predicate ge = ge
+end
+
+module Float64_next_prev
+  use export Float64RNE
+
+  constant max_value : t
+  axiom max_value : max_real = t'real max_value
+  meta "remove_unused:dependency" axiom max_value, function max_real
+
+  clone export Floating_next_prev with
+    type t = t,
+    function max_value = max_value,
+    function neg = neg,
+    predicate eq = eq,
+    predicate is_finite = t'isFinite,
+    predicate lt = lt,
+    predicate gt = gt,
+    predicate le = le,
+    predicate ge = ge
+end
+
+module Float80_next_prev
+  use export Float80RNE
+
+  constant max_value : t
+  axiom max_value : max_real = t'real max_value
+  meta "remove_unused:dependency" axiom max_value, function max_real
+
+  clone export Floating_next_prev with
+    type t = t,
+    function max_value = max_value,
+    function neg = neg,
+    predicate eq = eq,
+    predicate is_finite = t'isFinite,
+    predicate lt = lt,
+    predicate gt = gt,
+    predicate le = le,
+    predicate ge = ge
+end
+
+module Float32
+  use export Float32RNE
+
+  clone export Floating with
+    type t = t,
+    predicate is_zero = is_zero,
+    predicate is_positive = is_positive,
+    function sqrt_rne = sqrt_rne,
+    predicate lt = lt,
+    predicate le = le,
+    predicate gt = gt,
+    predicate ge = ge,
+    predicate eq = eq,
+    function div_rne = div_rne
+
+  val constant one : t
+  ensures { result = (1.0:t) }
+  axiom one_is_int: is_int one
+  meta "remove_unused:dependency" axiom one_is_int, function one
+  axiom one_of_int: one = of_int RNA 1
+  meta "remove_unused:dependency" axiom one_of_int, function one
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+end
+
+module Float64
+  use export Float64RNE
+
+  clone export Floating with
+    type t = t,
+    predicate is_zero = is_zero,
+    predicate is_positive = is_positive,
+    function sqrt_rne = sqrt_rne,
+    predicate lt = lt,
+    predicate le = le,
+    predicate gt = gt,
+    predicate ge = ge,
+    predicate eq = eq,
+    function div_rne = div_rne
+
+  val constant one : t
+  ensures { result = (1.0:t) }
+  axiom one_is_int: is_int one
+  meta "remove_unused:dependency" axiom one_is_int, function one
+  axiom one_of_int: one = of_int RNA 1
+  meta "remove_unused:dependency" axiom one_of_int, function one
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+end
+
+module Float80
+  use export Float80RNE
+
+  clone export Floating with
+    type t = t,
+    predicate is_zero = is_zero,
+    predicate is_positive = is_positive,
+    function sqrt_rne = sqrt_rne,
+    predicate lt = lt,
+    predicate le = le,
+    predicate gt = gt,
+    predicate ge = ge,
+    predicate eq = eq,
+    function div_rne = div_rne
+
+  val constant one : t
+  ensures { result = (1.0:t) }
+  axiom one_is_int: is_int one
+  meta "remove_unused:dependency" axiom one_is_int, function one
+  axiom one_of_int: one = of_int RNA 1
+  meta "remove_unused:dependency" axiom one_of_int, function one
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+end
+
+module Float32_operations
+  use export Float32RNE
+
+  predicate is_one (x : t) =  x = (1.0:t)
+
+  predicate is_ge_zero (x : t) = le (0.0:t) x
+
+  predicate is_gt_zero (x : t) = lt (0.0:t) x
+
+  predicate is_ge_one (x : t) = le (1.0:t) x
+
+  predicate abs_le_one (x : t) = le (-1.0:t) x /\ le x (1.0:t)
+
+  predicate abs_ge_one (x : t) = le x (-1.0:t) \/ le (1.0:t) x
+
+  predicate abs_lt_one (x : t) = lt (-1.0:t) x /\ lt x (1.0:t)
+
+  predicate abs_gt_one (x : t) = lt x (-1.0:t) \/ lt (1.0:t) x
+
+  predicate log_no_overflow (x : t) = t'isFinite x
+  (* Log never overflows on 32 bits, ensured by review *)
+
+  predicate log_base_no_overflow (x : t) (b : t) = t'isFinite x /\ t'isFinite b
+  (* Log_Base never overflows on 32 bits, ensured by review *)
+
+  predicate tan_no_overflow (x : t) = t'isFinite x
+  (* Tan never overflows on 32 bits, ensured by review *)
+
+  clone export Floating_operations with
+    type t = t,
+    predicate is_finite = t'isFinite,
+    predicate is_zero = is_zero,
+    predicate is_one = is_one,
+    predicate is_ge_zero = is_ge_zero,
+    predicate is_gt_zero = is_gt_zero,
+    predicate is_ge_one = is_ge_one,
+    predicate abs_le_one = abs_le_one,
+    predicate abs_ge_one = abs_ge_one,
+    predicate abs_lt_one = abs_lt_one,
+    predicate abs_gt_one = abs_gt_one,
+    predicate log_no_overflow = log_no_overflow,
+    predicate log_base_no_overflow = log_base_no_overflow,
+    predicate tan_no_overflow = tan_no_overflow
+end
+
+module Float64_operations
+  use export Float64RNE
+
+  predicate is_one (x : t) =  x = (1.0:t)
+
+  predicate is_ge_zero (x : t) = le (0.0:t) x
+
+  predicate is_gt_zero (x : t) = lt (0.0:t) x
+
+  predicate is_ge_one (x : t) = le (1.0:t) x
+
+  predicate abs_le_one (x : t) = le (-1.0:t) x /\ le x (1.0:t)
+
+  predicate abs_ge_one (x : t) = le x (-1.0:t) \/ le (1.0:t) x
+
+  predicate abs_lt_one (x : t) = lt (-1.0:t) x /\ lt x (1.0:t)
+
+  predicate abs_gt_one (x : t) = lt x (-1.0:t) \/ lt (1.0:t) x
+
+  predicate log_no_overflow (x : t) = t'isFinite x
+  (* Log never overflows on 64 bits, ensured by review *)
+
+  predicate log_base_no_overflow (x : t) (b : t) = t'isFinite x /\ t'isFinite b
+  (* Log_Base never overflows on 64 bits, ensured by review *)
+
+  predicate tan_no_overflow (x : t) = t'isFinite x
+  (* Tan never overflows on 64 bits, ensured by review *)
+
+  clone export Floating_operations with
+    type t = t,
+    predicate is_finite = t'isFinite,
+    predicate is_zero = is_zero,
+    predicate is_one = is_one,
+    predicate is_ge_zero = is_ge_zero,
+    predicate is_gt_zero = is_gt_zero,
+    predicate is_ge_one = is_ge_one,
+    predicate abs_le_one = abs_le_one,
+    predicate abs_ge_one = abs_ge_one,
+    predicate abs_lt_one = abs_lt_one,
+    predicate abs_gt_one = abs_gt_one,
+    predicate log_no_overflow = log_no_overflow,
+    predicate log_base_no_overflow = log_base_no_overflow,
+    predicate tan_no_overflow = tan_no_overflow
+end
+
+module Float80_operations
+  use export Float80RNE
+
+  predicate is_one (x : t) =  x = (1.0:t)
+
+  predicate is_ge_zero (x : t) = le (0.0:t) x
+
+  predicate is_gt_zero (x : t) = lt (0.0:t) x
+
+  predicate is_ge_one (x : t) = le (1.0:t) x
+
+  predicate abs_le_one (x : t) = le (-1.0:t) x /\ le x (1.0:t)
+
+  predicate abs_ge_one (x : t) = le x (-1.0:t) \/ le (1.0:t) x
+
+  predicate abs_lt_one (x : t) = lt (-1.0:t) x /\ lt x (1.0:t)
+
+  predicate abs_gt_one (x : t) = lt x (-1.0:t) \/ lt (1.0:t) x
+
+  predicate log_no_overflow (x : t) = t'isFinite x
+  (* Log never overflows on 80 bits, ensured by review *)
+
+  predicate log_base_no_overflow (x : t) (b : t) = t'isFinite x /\ t'isFinite b
+  (* Log_Base never overflows on 80 bits, ensured by review *)
+
+  predicate tan_no_overflow (x : t) = t'isFinite x
+  (* Tan never overflows on 80 bits, ensured by review *)
+
+  clone export Floating_operations with
+    type t = t,
+    predicate is_finite = t'isFinite,
+    predicate is_zero = is_zero,
+    predicate is_one = is_one,
+    predicate is_ge_zero = is_ge_zero,
+    predicate is_gt_zero = is_gt_zero,
+    predicate is_ge_one = is_ge_one,
+    predicate abs_le_one = abs_le_one,
+    predicate abs_ge_one = abs_ge_one,
+    predicate abs_lt_one = abs_lt_one,
+    predicate abs_gt_one = abs_gt_one,
+    predicate log_no_overflow = log_no_overflow,
+    predicate log_base_no_overflow = log_base_no_overflow,
+    predicate tan_no_overflow = tan_no_overflow
+end
+
+module Float32_64_Converter
+  use export ieee_float.Float32_64_Converter
+
+  function to_float64_rne (x:Float32.t) : Float64.t = to_large RNE x
+  function to_float32_rne (x:Float64.t) : Float32.t = to_small RNE x
+
+  val to_float64_rne (x:Float32.t) : Float64.t
+  ensures { result = to_large RNE x }
+  val to_float32_rne (x:Float64.t) : Float32.t
+  ensures { result = to_small RNE x }
+
+  val range_check_ (f l x : Float64.t) : Float64.t
+    requires { (Float64.(.<=) f x) /\ (Float64.(.<=) x l) }
+    ensures { result = x }
+end
+
+module Float32_80_Converter
+  use export ieee_float.Float32_80_Converter
+
+  function to_float80_rne (x:Float32.t) : Float80.t = to_large RNE x
+  function to_float32_rne (x:Float80.t) : Float32.t = to_small RNE x
+
+  val to_float80_rne (x:Float32.t) : Float80.t
+  ensures { result = to_large RNE x }
+  val to_float32_rne (x:Float80.t) : Float32.t
+  ensures { result = to_small RNE x }
+
+  val range_check_ (f l x : Float80.t) : Float80.t
+    requires { (Float80.(.<=) f x) /\ (Float80.(.<=) x l) }
+    ensures { result = x }
+end
+
+module Float64_80_Converter
+  use export ieee_float.Float64_80_Converter
+
+  function to_float80_rne (x:Float64.t) : Float80.t = to_large RNE x
+  function to_float64_rne (x:Float80.t) : Float64.t = to_small RNE x
+
+  val to_float80_rne (x:Float64.t) : Float80.t
+  ensures { result = to_large RNE x }
+  val to_float64_rne (x:Float80.t) : Float64.t
+  ensures { result = to_small RNE x }
+
+  val range_check_ (f l x : Float80.t) : Float80.t
+    requires { (Float80.(.<=) f x) /\ (Float80.(.<=) x l) }
+    ensures { result = x }
+end
+
+module Float32_BV_Converter
+  use export ieee_float.Float32_BV_Converter
+  use        ieee_float.Float32
+
+  function of_ubv8_rne  (x:BV8.t)  : t = of_ubv8  RNE x
+  function of_ubv16_rne (x:BV16.t) : t = of_ubv16 RNE x
+  function of_ubv32_rne (x:BV32.t) : t = of_ubv32 RNE x
+  function of_ubv64_rne (x:BV64.t) : t = of_ubv64 RNE x
+  val of_ubv8_rne  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RNE x }
+  val of_ubv16_rne (x:BV16.t) : t
+  ensures { result = of_ubv16 RNE x }
+  val of_ubv32_rne (x:BV32.t) : t
+  ensures { result = of_ubv32 RNE x }
+  val of_ubv64_rne (x:BV64.t) : t
+  ensures { result = of_ubv64 RNE x }
+
+  function of_ubv8_rtp  (x:BV8.t)  : t = of_ubv8  RTP x
+  function of_ubv16_rtp (x:BV16.t) : t = of_ubv16 RTP x
+  function of_ubv32_rtp (x:BV32.t) : t = of_ubv32 RTP x
+  function of_ubv64_rtp (x:BV64.t) : t = of_ubv64 RTP x
+  val of_ubv8_rtp  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RTP x }
+  val of_ubv16_rtp (x:BV16.t) : t
+  ensures { result = of_ubv16 RTP x }
+  val of_ubv32_rtp (x:BV32.t) : t
+  ensures { result = of_ubv32 RTP x }
+  val of_ubv64_rtp (x:BV64.t) : t
+  ensures { result = of_ubv64 RTP x }
+
+  function of_ubv8_rtn  (x:BV8.t)  : t = of_ubv8  RTN x
+  function of_ubv16_rtn (x:BV16.t) : t = of_ubv16 RTN x
+  function of_ubv32_rtn (x:BV32.t) : t = of_ubv32 RTN x
+  function of_ubv64_rtn (x:BV64.t) : t = of_ubv64 RTN x
+  val of_ubv8_rtn  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RTN x }
+  val of_ubv16_rtn (x:BV16.t) : t
+  ensures { result = of_ubv16 RTN x }
+  val of_ubv32_rtn (x:BV32.t) : t
+  ensures { result = of_ubv32 RTN x }
+  val of_ubv64_rtn (x:BV64.t) : t
+  ensures { result = of_ubv64 RTN x }
+
+  function to_ubv8_rna  (x:t) : BV8.t  = to_ubv8  RNA x
+  function to_ubv16_rna (x:t) : BV16.t = to_ubv16 RNA x
+  function to_ubv32_rna (x:t) : BV32.t = to_ubv32 RNA x
+  function to_ubv64_rna (x:t) : BV64.t = to_ubv64 RNA x
+  val to_ubv8_rna  (x:t) : BV8.t
+  ensures { result = to_ubv8  RNA x }
+  val to_ubv16_rna (x:t) : BV16.t
+  ensures { result = to_ubv16 RNA x }
+  val to_ubv32_rna (x:t) : BV32.t
+  ensures { result = to_ubv32 RNA x }
+  val to_ubv64_rna (x:t) : BV64.t
+  ensures { result = to_ubv64 RNA x }
+
+  val range_check_ (f l n : t) : t
+    requires {f .<= n .<= l}
+    ensures {result = n /\ f .<= n .<= l}
+end
+
+module Float64_BV_Converter
+  use export ieee_float.Float64_BV_Converter
+  use        ieee_float.Float64
+
+  function of_ubv8_rne  (x:BV8.t)  : t = of_ubv8  RNE x
+  function of_ubv16_rne (x:BV16.t) : t = of_ubv16 RNE x
+  function of_ubv32_rne (x:BV32.t) : t = of_ubv32 RNE x
+  function of_ubv64_rne (x:BV64.t) : t = of_ubv64 RNE x
+  val of_ubv8_rne  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RNE x }
+  val of_ubv16_rne (x:BV16.t) : t
+  ensures { result = of_ubv16 RNE x }
+  val of_ubv32_rne (x:BV32.t) : t
+  ensures { result = of_ubv32 RNE x }
+  val of_ubv64_rne (x:BV64.t) : t
+  ensures { result = of_ubv64 RNE x }
+
+  function of_ubv8_rtp  (x:BV8.t)  : t = of_ubv8  RTP x
+  function of_ubv16_rtp (x:BV16.t) : t = of_ubv16 RTP x
+  function of_ubv32_rtp (x:BV32.t) : t = of_ubv32 RTP x
+  function of_ubv64_rtp (x:BV64.t) : t = of_ubv64 RTP x
+  val of_ubv8_rtp  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RTP x }
+  val of_ubv16_rtp (x:BV16.t) : t
+  ensures { result = of_ubv16 RTP x }
+  val of_ubv32_rtp (x:BV32.t) : t
+  ensures { result = of_ubv32 RTP x }
+  val of_ubv64_rtp (x:BV64.t) : t
+  ensures { result = of_ubv64 RTP x }
+
+  function of_ubv8_rtn  (x:BV8.t)  : t = of_ubv8  RTN x
+  function of_ubv16_rtn (x:BV16.t) : t = of_ubv16 RTN x
+  function of_ubv32_rtn (x:BV32.t) : t = of_ubv32 RTN x
+  function of_ubv64_rtn (x:BV64.t) : t = of_ubv64 RTN x
+  val of_ubv8_rtn  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RTN x }
+  val of_ubv16_rtn (x:BV16.t) : t
+  ensures { result = of_ubv16 RTN x }
+  val of_ubv32_rtn (x:BV32.t) : t
+  ensures { result = of_ubv32 RTN x }
+  val of_ubv64_rtn (x:BV64.t) : t
+  ensures { result = of_ubv64 RTN x }
+
+  function to_ubv8_rna  (x:t) : BV8.t  = to_ubv8  RNA x
+  function to_ubv16_rna (x:t) : BV16.t = to_ubv16 RNA x
+  function to_ubv32_rna (x:t) : BV32.t = to_ubv32 RNA x
+  function to_ubv64_rna (x:t) : BV64.t = to_ubv64 RNA x
+  val to_ubv8_rna  (x:t) : BV8.t
+  ensures { result = to_ubv8  RNA x }
+  val to_ubv16_rna (x:t) : BV16.t
+  ensures { result = to_ubv16 RNA x }
+  val to_ubv32_rna (x:t) : BV32.t
+  ensures { result = to_ubv32 RNA x }
+  val to_ubv64_rna (x:t) : BV64.t
+  ensures { result = to_ubv64 RNA x }
+
+  val range_check_ (f l n : t) : t
+    requires {f .<= n .<= l}
+    ensures {result = n /\ f .<= n .<= l}
+end
+
+module Float80_BV_Converter
+  use export ieee_float.Float80_BV_Converter
+  use        ieee_float.Float80
+
+  function of_ubv8_rne  (x:BV8.t)  : t = of_ubv8  RNE x
+  function of_ubv16_rne (x:BV16.t) : t = of_ubv16 RNE x
+  function of_ubv32_rne (x:BV32.t) : t = of_ubv32 RNE x
+  function of_ubv64_rne (x:BV64.t) : t = of_ubv64 RNE x
+  val of_ubv8_rne  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RNE x }
+  val of_ubv16_rne (x:BV16.t) : t
+  ensures { result = of_ubv16 RNE x }
+  val of_ubv32_rne (x:BV32.t) : t
+  ensures { result = of_ubv32 RNE x }
+  val of_ubv64_rne (x:BV64.t) : t
+  ensures { result = of_ubv64 RNE x }
+
+  function of_ubv8_rtp  (x:BV8.t)  : t = of_ubv8  RTP x
+  function of_ubv16_rtp (x:BV16.t) : t = of_ubv16 RTP x
+  function of_ubv32_rtp (x:BV32.t) : t = of_ubv32 RTP x
+  function of_ubv64_rtp (x:BV64.t) : t = of_ubv64 RTP x
+  val of_ubv8_rtp  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RTP x }
+  val of_ubv16_rtp (x:BV16.t) : t
+  ensures { result = of_ubv16 RTP x }
+  val of_ubv32_rtp (x:BV32.t) : t
+  ensures { result = of_ubv32 RTP x }
+  val of_ubv64_rtp (x:BV64.t) : t
+  ensures { result = of_ubv64 RTP x }
+
+  function of_ubv8_rtn  (x:BV8.t)  : t = of_ubv8  RTN x
+  function of_ubv16_rtn (x:BV16.t) : t = of_ubv16 RTN x
+  function of_ubv32_rtn (x:BV32.t) : t = of_ubv32 RTN x
+  function of_ubv64_rtn (x:BV64.t) : t = of_ubv64 RTN x
+  val of_ubv8_rtn  (x:BV8.t)  : t
+  ensures { result = of_ubv8  RTN x }
+  val of_ubv16_rtn (x:BV16.t) : t
+  ensures { result = of_ubv16 RTN x }
+  val of_ubv32_rtn (x:BV32.t) : t
+  ensures { result = of_ubv32 RTN x }
+  val of_ubv64_rtn (x:BV64.t) : t
+  ensures { result = of_ubv64 RTN x }
+
+  function to_ubv8_rna  (x:t) : BV8.t  = to_ubv8  RNA x
+  function to_ubv16_rna (x:t) : BV16.t = to_ubv16 RNA x
+  function to_ubv32_rna (x:t) : BV32.t = to_ubv32 RNA x
+  function to_ubv64_rna (x:t) : BV64.t = to_ubv64 RNA x
+  val to_ubv8_rna  (x:t) : BV8.t
+  ensures { result = to_ubv8  RNA x }
+  val to_ubv16_rna (x:t) : BV16.t
+  ensures { result = to_ubv16 RNA x }
+  val to_ubv32_rna (x:t) : BV32.t
+  ensures { result = to_ubv32 RNA x }
+  val to_ubv64_rna (x:t) : BV64.t
+  ensures { result = to_ubv64 RNA x }
+
+  val range_check_ (f l n : t) : t
+    requires {f .<= n .<= l}
+    ensures {result = n /\ f .<= n .<= l}
+end
+
+module Boolean
+  use export bool.Bool
+  use export bool.Ite
+  use        int.Int
+  use        Main
+
+  use export "_gnatprove_standard_th".Boolean_Func
+
+  (* Boolean logical connectors, functions for conversion of booleans, etc *)
+
+  val to_int (b : bool) : int
+  ensures { result = to_int b }
+
+  val of_int (i : int) : bool
+  ensures { result = of_int i }
+
+  let function last : int = 1
+  let function first : int = 0
+
+  predicate in_range (x : int) = x = 0 \/ x = 1
+  val in_range (x : int) : bool
+  ensures { result <-> in_range x }
+
+  predicate dynamic_property (f l x : int) = in_range x
+
+  val function attr__ATTRIBUTE_IMAGE bool : __image
+
+  predicate attr__ATTRIBUTE_VALUE__pre_check (x : __image)
+
+  function attr__ATTRIBUTE_VALUE __image : bool
+
+  val attr__ATTRIBUTE_VALUE_ (x : __image) : bool
+    requires { attr__ATTRIBUTE_VALUE__pre_check x }
+    ensures { result = attr__ATTRIBUTE_VALUE x }
+
+  val range_check_ (n : int) : int
+    requires { in_range n }
+    ensures { result = n }
+
+  val check_not_last (n : int) : int
+    requires { n <> last }
+    ensures { result = n }
+
+  val check_not_first (n : int) : int
+    requires { n <> first }
+    ensures { result = n }
+
+  val bool_eq (x : bool) (y : bool) : bool
+    ensures { result = if x = y then True else False }
+
+  val bool_ne (x : bool) (y : bool) : bool
+    ensures { result = if x = y then False else True }
+
+end
+
+(* The following theories care about the *contents* of Arrays, and defines
+   access and update functions. They do not care about properties of bounds.
+   However, boolean equality and sliding needs array bounds as *inputs*. These
+   functions are independent of the representation of constrained/unconstrained
+   arrays. This also means that there is some special circuitry in gnat2why to
+   actually call these functions.
+
+   For Boolean equality, the arguments are, in order:
+    - the first array
+    - for each dimension, first and last
+    - the second array
+    - for each dimension, first and last
+
+  Boolean equality returns true when all dimensions of the two arrays are of
+  the same length, and the arrays contain the same elements in their valid
+  range (note that access needs to be slided when the bounds do not coincide,
+  but the length is still the same).
+
+  For sliding, the arguments are, in order:
+    - the array
+    - for each dimension, the old and new value of first
+
+  Sliding shifts the elements of the array according to the difference between
+  the old and new value of first.
+
+*)
+module Array__Index
+  type t
+
+  predicate le t t
+  predicate lt t t
+  predicate gt t t
+
+  function  add t t : t
+  function  sub t t : t
+
+  function one : t
+end
+
+module Array__1
+  use bool.Bool
+
+  clone Array__Index as I1
+
+  type component_type
+
+  type map
+  function projection_to_array map : I1.t -> component_type
+  meta "model_projection" function projection_to_array
+
+  type map__ref = { mutable map__content [@model_trace:] : map }
+  val map__havoc (x : map__ref) : unit
+     writes { x }
+
+  predicate has_bounds map I1.t I1.t
+
+  val function get map I1.t : component_type
+
+  axiom get_proj : forall m i. get m i = projection_to_array m i
+
+  predicate eq_ext map map I1.t I1.t
+
+  axiom eq_ext_def :
+    forall a1 a2 : map, f l : I1.t [eq_ext a1 a2 f l].
+      eq_ext a1 a2 f l <-> a1 = a2
+  meta "remove_unused:dependency" axiom eq_ext_def, predicate eq_ext
+
+  axiom extensionality :
+    forall a1 a2 : map, f l : I1.t [eq_ext a1 a2 f l].
+      a1 <> a2 -> has_bounds a1 f l -> has_bounds a2 f l ->
+      exists i : I1.t. I1.le f i /\ I1.le i l /\ get a1 i <> get a2 i
+  meta "remove_unused:dependency" axiom extensionality, predicate eq_ext
+
+  (* Writing into an array *)
+
+  val function set map I1.t component_type : map
+  axiom set_eq :
+    forall a : map, i : I1.t, v : component_type [set a i v].
+      (* value at index i *)
+      get (set a i v) i = v
+  meta "remove_unused:dependency" axiom set_eq, function set
+  axiom set_neq :
+    forall a : map, i : I1.t, v : component_type
+      [set a i v].
+    forall j : I1.t
+      [get a j | get (set a i v) j].
+      (* value at index j /= i *)
+      i <> j -> get (set a i v) j = get a j
+  meta "remove_unused:dependency" axiom set_neq, function set
+  axiom set_has_bounds :
+    forall a : map, i f l : I1.t, v : component_type
+      [has_bounds (set a i v) f l].
+      (* bounds *)
+      I1.le f i /\ I1.le i l ->
+      has_bounds a f l -> has_bounds (set a i v) f l
+  meta "remove_unused:dependency" axiom set_has_bounds, function set
+
+  (* Sliding an array from old_first to new_first *)
+
+  val function slide map I1.t I1.t : map
+
+  (* Special case of an array not slided *)
+  axiom slide_eq :
+    forall a : map, first : I1.t [slide a first first].
+      slide a first first = a
+  meta "remove_unused:dependency" axiom slide_eq, function slide
+
+  axiom slide_def :
+    forall a : map, old_first new_first : I1.t [slide a old_first new_first].
+      (* slided values *)
+      (forall i : I1.t [get (slide a old_first new_first) i].
+         get (slide a old_first new_first) i =
+	 get a (I1.sub i (I1.sub new_first old_first)))
+    /\
+      (* bounds *)
+      (forall new_last : I1.t [has_bounds (slide a old_first new_first) new_first new_last].
+         has_bounds a old_first
+	   (I1.sub new_last (I1.sub new_first old_first)) ->
+         has_bounds (slide a old_first new_first) new_first new_last)
+  meta "remove_unused:dependency" axiom slide_def, function slide
+
+  (* An array containing the value v at all indexes. It is used for the value
+     of aggregate associations with a box. *)
+
+   function const component_type I1.t I1.t : map
+
+   axiom const_def :
+    forall v : component_type, first last : I1.t [const v first last].
+      (* values *)
+      (forall i : I1.t  [get (const v first last) i].
+         (I1.le first i /\ I1.le i last) -> get (const v first last) i = v)
+    /\
+      (* bounds *)
+      has_bounds (const v first last) first last
+   meta "remove_unused:dependency" axiom const_def, function const
+
+  (* A slice of a array *)
+
+  val function slice map I1.t I1.t : map
+
+  (* Special case of an array not sliced *)
+  axiom slice_eq :
+    forall a : map, f l : I1.t [slice a f l, has_bounds a f l].
+      has_bounds a f l -> slice a f l = a
+  meta "remove_unused:dependency" axiom slice_eq, function slice
+
+  (* Special case of a slice of a slice *)
+  axiom slice_slice :
+    forall a : map, f1 l1 f2 l2 : I1.t [slice (slice a f1 l1) f2 l2].
+      (I1.le f1 f2 /\ I1.le l2 l1) ->
+      slice (slice a f1 l1) f2 l2 = slice a f2 l2
+  meta "remove_unused:dependency" axiom slice_slice, function slice
+
+  axiom slice_def :
+    forall a : map, f l : I1.t [slice a f l].
+      (* values *)
+      (forall i : I1.t [get (slice a f l) i | get a i].
+         (I1.le f i /\ I1.le i l) -> get (slice a f l) i = get a i)
+  meta "remove_unused:dependency" axiom slice_def, function slice
+
+  axiom slice_has_bounds :
+    forall a : map, f l : I1.t [has_bounds (slice a f l) f l].
+      (* bounds *)
+      has_bounds (slice a f l) f l
+  meta "remove_unused:dependency" axiom slice_has_bounds, function slice
+
+  (* Concatenation is only defined for one-dimensional arrays; it appends a
+     map to another. We do not really care about the valid ranges of the
+     original arrays, but we need to know for each access to the
+     concatenation, which of the arguments we need to look at. Also, if we are
+     interested in the second argument, a shift must be made depending on the
+     original "first" value. *)
+
+  val function concat map I1.t I1.t map I1.t I1.t I1.t : map
+  meta "encoding:lskept" function concat
+
+  axiom concat_def :
+    forall a b : map, a_first a_last b_first b_last new_last : I1.t
+      [concat a a_first a_last b b_first b_last new_last].
+      (* bounds *)
+      (I1.le a_first a_last -> I1.le a_last new_last ->
+       has_bounds (concat a a_first a_last b b_first b_last new_last) a_first new_last)
+    /\
+      (* values *)
+      (forall i : I1.t
+        [get (concat a a_first a_last b b_first b_last new_last) i].
+         (* a *)
+         ((I1.le a_first i /\ I1.le i a_last) ->
+             get (concat a a_first a_last b b_first b_last new_last) i =
+	     get a i)
+       /\
+         (* b *)
+         ((I1.gt i a_last /\ I1.le i new_last) ->
+             get (concat a a_first a_last b b_first b_last new_last) i =
+	     get b (I1.add (I1.sub i a_last) (I1.sub b_first I1.one))))
+  meta "remove_unused:dependency" axiom concat_def, function concat
+
+  (* Special case of concatenation when the left operand is a component. a_first
+     is the first index of the new array. The right operand is slided so that it
+     starts at a_first + 1. *)
+
+  val function concat_singleton_left component_type I1.t map I1.t I1.t I1.t : map
+  meta "encoding:lskept" function concat_singleton_left
+
+  axiom concat_singleton_left_def :
+    forall a : component_type, l b : map, a_first b_first b_last new_last : I1.t
+      [concat_singleton_left a a_first b b_first b_last new_last].
+      (* bounds *)
+      (I1.le a_first new_last ->
+         has_bounds (concat_singleton_left a a_first b b_first b_last new_last) a_first new_last)
+    /\
+      (* a *)
+      get (concat_singleton_left a a_first b b_first b_last new_last) a_first =
+      a
+    /\
+      (* b *)
+      (forall i : I1.t
+        [get (concat_singleton_left a a_first b b_first b_last new_last) i].
+        ((I1.gt i a_first /\ I1.le i new_last) ->
+           get (concat_singleton_left a a_first b b_first b_last new_last) i =
+	   get b (I1.add (I1.sub i a_first) (I1.sub b_first I1.one))))
+  meta "remove_unused:dependency" axiom concat_singleton_left_def, function concat_singleton_left
+
+  (* Special case of concatenation on constrained array *)
+  axiom concat_singleton_left_def_eq :
+    forall a : component_type, b : map, a_first b_last new_last, i : I1.t
+      [get (concat_singleton_left a a_first b a_first b_last new_last) i].
+      (* b *)
+      ((I1.gt i a_first /\ I1.le i new_last) ->
+        get (concat_singleton_left a a_first b a_first b_last new_last) i = get b (I1.sub i I1.one))
+  meta "remove_unused:dependency" axiom concat_singleton_left_def_eq, function concat_singleton_left
+
+  (* Special case of concatenation when the right operand is a component. *)
+
+  val function concat_singleton_right map I1.t I1.t component_type I1.t : map
+  meta "encoding:lskept" function concat_singleton_right
+
+  axiom concat_singleton_right_def :
+    forall a : map, b : component_type, a_first a_last new_last : I1.t
+      [concat_singleton_right a a_first a_last b new_last].
+      (* bounds *)
+      ((I1.le a_first a_last /\ I1.lt a_last new_last) ->
+        has_bounds a a_first a_last ->
+        has_bounds (concat_singleton_right a a_first a_last b new_last) a_first new_last)
+    /\
+      (* b *)
+      (I1.lt a_last (I1.add a_last I1.one) ->
+       get (concat_singleton_right a a_first a_last b new_last) (I1.add a_last I1.one) = b)
+    /\
+      (* a *)
+      (forall i : I1.t
+         [get (concat_singleton_right a a_first a_last b new_last) i | get a i].
+         ((I1.le a_first i /\ I1.le i a_last) ->
+             get (concat_singleton_right a a_first a_last b new_last) i =
+	     get a i))
+  meta "remove_unused:dependency" axiom concat_singleton_right_def, function concat_singleton_right
+
+  (* Special case of concatenation when both operands are components. a_first
+     is the first index of the resulting array. *)
+
+  val function concat_singletons component_type I1.t component_type I1.t : map
+  meta "encoding:lskept" function concat_singletons
+
+  axiom concat_singletons_def :
+    forall a b : component_type, a_first new_last : I1.t
+      [concat_singletons a a_first b new_last].
+      (* bounds *)
+      (I1.lt a_first new_last ->
+       has_bounds (concat_singletons a a_first b new_last) a_first new_last)
+    /\
+      (* a *)
+      get (concat_singletons a a_first b new_last) a_first = a
+    /\
+      (* b *)
+      get (concat_singletons a a_first b new_last) (I1.add a_first I1.one) = b
+  meta "remove_unused:dependency" axiom concat_singletons_def, function concat_singletons
+
+  (* An array containing the value v at index i. It is used for the result of
+     the concatenation of an empty array with a component. *)
+
+   val function singleton component_type I1.t : map
+   meta "encoding:lskept" function singleton
+
+   axiom singleton_bounds :
+    forall v : component_type, i : I1.t [singleton v i].
+      (* bounds *)
+      has_bounds (singleton v i) i i
+      (* value *)
+      /\ get (singleton v i) i = v
+  meta "remove_unused:dependency" axiom singleton_bounds, function singleton
+end
+
+module Array__2
+  use bool.Bool
+
+  clone Array__Index as I1
+  clone Array__Index as I2
+
+  type component_type
+
+  type map
+  type map__ref = { mutable map__content [@model_trace:] : map }
+  val map__havoc (x : map__ref) : unit
+     writes { x }
+
+  predicate has_bounds map I1.t I1.t I2.t I2.t
+
+  val function get map I1.t I2.t : component_type
+
+  predicate eq_ext map map I1.t I1.t I2.t I2.t
+
+  axiom eq_ext_def :
+    forall a1 a2 : map, f1 l1 : I1.t, f2 l2 : I2.t
+      [eq_ext a1 a2 f1 l1 f2 l2].
+      eq_ext a1 a2 f1 l1 f2 l2 <-> a1 = a2
+  meta "remove_unused:dependency" axiom eq_ext_def, predicate eq_ext
+
+  axiom extensionality :
+    forall a1 a2 : map, f1 l1 : I1.t, f2 l2 : I2.t
+      [eq_ext a1 a2 f1 l1 f2 l2].
+      a1 <> a2 ->
+      has_bounds a1 f1 l1 f2 l2 ->
+      has_bounds a2 f1 l1 f2 l2 ->
+      exists i1 : I1.t, i2 : I2.t.
+        I1.le f1 i1 /\ I1.le i1 l1 /\
+        I2.le f2 i2 /\ I2.le i2 l2 /\ get a1 i1 i2 <> get a2 i1 i2
+  meta "remove_unused:dependency" axiom extensionality, predicate eq_ext
+
+  (* Writing into an array *)
+
+  val function set map I1.t I2.t component_type : map
+  axiom set_def :
+    forall a : map, i1 : I1.t, i2 : I2.t, v : component_type [set a i1 i2 v].
+      (* value at index i1 i2 *)
+      get (set a i1 i2 v) i1 i2 = v
+    /\
+      (* value at index j1, j2 /= i1, i2 *)
+      (forall j1 : I1.t, j2 : I2.t
+         [get a j1 j2 | get (set a i1 i2 v) j1 j2].
+         (i1 <> j1 \/ i2 <> j2) -> get (set a i1 i2 v) j1 j2 = get a j1 j2)
+    /\
+      (* bounds *)
+      (forall f1 l1 : I1.t, f2 l2 : I2.t
+         [has_bounds (set a i1 i2 v) f1 l1 f2 l2].
+         I1.le f1 i1 /\ I1.le i1 l1 ->
+         I2.le f2 i2 /\ I2.le i2 l2 ->
+         has_bounds a f1 l1 f2 l2 -> has_bounds (set a i1 i2 v) f1 l1 f2 l2)
+  meta "remove_unused:dependency" axiom set_def, function set
+
+  (* Sliding an array from old_first to new_first *)
+
+  val function slide map I1.t I1.t I2.t I2.t : map
+
+  (* Special case of an array not slided *)
+  axiom slide_eq :
+    forall a : map, first_1 : I1.t, first_2 : I2.t
+      [slide a first_1 first_1 first_2 first_2].
+      slide a first_1 first_1 first_2 first_2 = a
+  meta "remove_unused:dependency" axiom slide_eq, function slide
+
+  axiom slide_def :
+    forall a : map,
+           old_first_1 new_first_1 : I1.t,
+	   old_first_2 new_first_2 : I2.t
+      [slide a old_first_1 new_first_1 old_first_2 new_first_2].
+      (* slided values *)
+      (forall i1 : I1.t, i2 : I2.t
+         [get (slide a old_first_1 new_first_1 old_first_2 new_first_2) i1 i2].
+         get (slide a old_first_1 new_first_1 old_first_2 new_first_2) i1 i2 =
+	 get a (I1.sub i1 (I1.sub new_first_1 old_first_1)) (I2.sub i2 (I2.sub old_first_2 new_first_2)))
+    /\
+      (* bounds *)
+      (forall new_last_1 : I1.t, new_last_2 : I2.t
+         [has_bounds (slide a old_first_1 new_first_1 old_first_2 new_first_2) new_first_1 new_last_1 new_first_2 new_last_2].
+         has_bounds a
+	   old_first_1 (I1.sub new_last_1 (I1.sub new_first_1 old_first_1))
+	   old_first_2 (I2.sub new_last_2 (I2.sub new_first_2 old_first_2)) ->
+         has_bounds (slide a old_first_1 new_first_1 old_first_2 new_first_2) new_first_1 new_last_1 new_first_2 new_last_2)
+  meta "remove_unused:dependency" axiom slide_def, function slide
+
+  (* An array containing the value v at all indexes. It is used for the value
+     of aggregate associations with a box. *)
+
+   function const component_type I1.t I1.t I2.t I2.t : map
+
+   axiom const_def :
+    forall v : component_type,
+           first_1 last_1 : I1.t,
+	   first_2 last_2 : I2.t [const v first_1 last_1 first_2 last_2].
+      (* values *)
+      (forall i1 : I1.t, i2 : I2.t
+         [get (const v first_1 last_1 first_2 last_2) i1 i2].
+         (I1.le first_1 i1 /\ I1.le i1 last_1) ->
+         (I2.le first_2 i2 /\ I2.le i2 last_2) ->
+	 get (const v first_1 last_1 first_2 last_2) i1 i2 = v)
+    /\
+      (* bounds *)
+      has_bounds (const v first_1 last_1 first_2 last_2) first_1 last_1 first_2 last_2
+   meta "remove_unused:dependency" axiom const_def, function const
+
+  (* A slice of a array *)
+
+  val function slice map I1.t I1.t I2.t I2.t : map
+
+  (* Special case of an array not sliced *)
+  axiom slice_eq :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t
+      [slice a f1 l1 f2 l2, has_bounds a f1 l1 f2 l2].
+      has_bounds a f1 l1 f2 l2 -> slice a f1 l1 f2 l2 = a
+  meta "remove_unused:dependency" axiom slice_eq, function slice
+
+  axiom slice_def :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t
+      [slice a f1 l1 f2 l2].
+      (* values *)
+      forall i1 : I1.t, i2 : I2.t
+        [get (slice a f1 l1 f2 l2) i1 i2 | get a i1 i2].
+        (I1.le f1 i1 /\ I1.le i1 l1) ->
+        (I2.le f2 i2 /\ I2.le i2 l2) ->
+	get (slice a f1 l1 f2 l2) i1 i2 = get a i1 i2
+  meta "remove_unused:dependency" axiom slice_def, function slice
+
+  axiom slice_has_bounds :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t
+      [has_bounds (slice a f1 l1 f2 l2) f1 l1 f2 l2].
+      (* bounds *)
+      has_bounds (slice a f1 l1 f2 l2) f1 l1 f2 l2
+  meta "remove_unused:dependency" axiom slice_has_bounds, function slice
+end
+
+module Array__3
+  use bool.Bool
+
+  clone Array__Index as I1
+  clone Array__Index as I2
+  clone Array__Index as I3
+
+  type component_type
+
+  type map
+  type map__ref = { mutable map__content [@model_trace:] : map }
+  val map__havoc (x : map__ref) : unit
+     writes { x }
+
+  predicate has_bounds map I1.t I1.t I2.t I2.t I3.t I3.t
+
+  val function get map I1.t I2.t I3.t : component_type
+
+  predicate eq_ext map map I1.t I1.t I2.t I2.t I3.t I3.t
+
+  axiom eq_ext_def :
+    forall a1 a2 : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t
+      [eq_ext a1 a2 f1 l1 f2 l2 f3 l3].
+      eq_ext a1 a2 f1 l1 f2 l2 f3 l3 <-> a1 = a2
+  meta "remove_unused:dependency" axiom eq_ext_def, predicate eq_ext
+
+  axiom extensionality :
+    forall a1 a2 : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t
+      [eq_ext a1 a2 f1 l1 f2 l2 f3 l3].
+      a1 <> a2 ->
+      has_bounds a1 f1 l1 f2 l2 f3 l3 ->
+      has_bounds a2 f1 l1 f2 l2 f3 l3 ->
+      exists i1 : I1.t, i2 : I2.t, i3 : I3.t.
+        I1.le f1 i1 /\ I1.le i1 l1 /\
+        I2.le f2 i2 /\ I2.le i2 l2 /\
+        I3.le f3 i3 /\ I3.le i3 l3 /\ get a1 i1 i2 i3 <> get a2 i1 i2 i3
+  meta "remove_unused:dependency" axiom extensionality, predicate eq_ext
+
+  (* Writing into an array *)
+
+  val function set map I1.t I2.t I3.t component_type : map
+  axiom set_def :
+    forall a : map, i1 : I1.t, i2 : I2.t, i3 : I3.t, v : component_type
+      [set a i1 i2 i3 v].
+      (* value at index i1 i2 i3 *)
+      get (set a i1 i2 i3 v) i1 i2 i3 = v
+    /\
+      (* value at index j1, j2, j3 /= i1, i2, i3 *)
+      (forall j1 : I1.t, j2 : I2.t, j3 : I3.t
+         [get a j1 j2 j3 | get (set a i1 i2 i3 v) j1 j2 j3].
+         (i1 <> j1 \/ i2 <> j2 \/ i3 <> j3) ->
+	 get (set a i1 i2 i3 v) j1 j2 j3 = get a j1 j2 j3)
+    /\
+      (* bounds *)
+      (forall f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t
+         [has_bounds (set a i1 i2 i3 v) f1 l1 f2 l2 f3 l3].
+         I1.le f1 i1 /\ I1.le i1 l1 ->
+         I2.le f2 i2 /\ I2.le i2 l2 ->
+         I3.le f3 i3 /\ I3.le i3 l3 ->
+         has_bounds a f1 l1 f2 l2 f3 l3 ->
+	 has_bounds (set a i1 i2 i3 v) f1 l1 f2 l2 f3 l3)
+  meta "remove_unused:dependency" axiom set_def, function set
+
+  (* Sliding an array from old_first to new_first *)
+
+  val function slide map I1.t I1.t I2.t I2.t I3.t I3.t : map
+
+  (* Special case of an array not slided *)
+  axiom slide_eq :
+    forall a : map, first_1 : I1.t, first_2 : I2.t, first_3 : I3.t
+      [slide a first_1 first_1 first_2 first_2 first_3 first_3].
+      slide a first_1 first_1 first_2 first_2 first_3 first_3 = a
+  meta "remove_unused:dependency" axiom slide_eq, function slide
+
+  axiom slide_def :
+    forall a : map,
+           old_first_1 new_first_1 : I1.t,
+	   old_first_2 new_first_2 : I2.t,
+	   old_first_3 new_first_3 : I3.t
+      [slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3].
+      (* slided values *)
+      (forall i1 : I1.t, i2 : I2.t, i3 : I3.t
+         [get (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3) i1 i2 i3].
+         get (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3) i1 i2 i3 =
+	 get a (I1.sub i1 (I1.sub new_first_1 old_first_1)) (I2.sub i2 (I2.sub old_first_2 new_first_2)) (I3.sub i3 (I3.sub old_first_3 new_first_3)))
+    /\
+      (* bounds *)
+      (forall new_last_1 : I1.t, new_last_2 : I2.t, new_last_3 : I3.t
+         [has_bounds (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3) new_first_1 new_last_1 new_first_2 new_last_2 new_first_3 new_last_3].
+         has_bounds a
+	   old_first_1 (I1.sub new_last_1 (I1.sub new_first_1 old_first_1))
+	   old_first_2 (I2.sub new_last_2 (I2.sub new_first_2 old_first_2))
+	   old_first_3 (I3.sub new_last_3 (I3.sub new_first_3 old_first_3)) ->
+         has_bounds (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3) new_first_1 new_last_1 new_first_2 new_last_2 new_first_3 new_last_3)
+  meta "remove_unused:dependency" axiom slide_def, function slide
+
+  (* An array containing the value v at all indexes. It is used for the value
+     of aggregate associations with a box. *)
+
+   function const component_type I1.t I1.t I2.t I2.t I3.t I3.t : map
+
+   axiom const_def :
+    forall v : component_type,
+           first_1 last_1 : I1.t,
+	   first_2 last_2 : I2.t,
+	   first_3 last_3 : I3.t
+      [const v first_1 last_1 first_2 last_2 first_3 last_3].
+      (* values *)
+      (forall i1 : I1.t, i2 : I2.t, i3 : I3.t
+         [get (const v first_1 last_1 first_2 last_2 first_3 last_3) i1 i2 i3].
+         (I1.le first_1 i1 /\ I1.le i1 last_1) ->
+         (I2.le first_2 i2 /\ I2.le i2 last_2) ->
+         (I3.le first_3 i3 /\ I3.le i3 last_3) ->
+	 get (const v first_1 last_1 first_2 last_2 first_3 last_3) i1 i2 i3 = v)
+    /\
+      (* bounds *)
+      has_bounds (const v first_1 last_1 first_2 last_2 first_3 last_3) first_1 last_1 first_2 last_2 first_3 last_3
+   meta "remove_unused:dependency" axiom const_def, function const
+
+  (* A slice of a array *)
+
+  val function slice map I1.t I1.t I2.t I2.t I3.t I3.t : map
+
+  (* Special case of an array not sliced *)
+  axiom slice_eq :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t
+      [slice a f1 l1 f2 l2 f3 l3, has_bounds a f1 l1 f2 l2 f3 l3].
+      has_bounds a f1 l1 f2 l2 f3 l3 -> slice a f1 l1 f2 l2 f3 l3 = a
+  meta "remove_unused:dependency" axiom slice_eq, function slice
+
+  axiom slice_def :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t
+      [slice a f1 l1 f2 l2 f3 l3].
+      (* values *)
+      forall i1 : I1.t, i2 : I2.t, i3 : I3.t
+        [get (slice a f1 l1 f2 l2 f3 l3) i1 i2 i3 | get a i1 i2 i3].
+        (I1.le f1 i1 /\ I1.le i1 l1) ->
+        (I2.le f2 i2 /\ I2.le i2 l2) ->
+        (I3.le f3 i3 /\ I3.le i3 l3) ->
+	get (slice a f1 l1 f2 l2 f3 l3) i1 i2 i3 = get a i1 i2 i3
+  meta "remove_unused:dependency" axiom slice_def, function slice
+
+  axiom slice_has_bounds :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t
+      [has_bounds (slice a f1 l1 f2 l2 f3 l3) f1 l1 f2 l2 f3 l3].
+      (* bounds *)
+      has_bounds (slice a f1 l1 f2 l2 f3 l3) f1 l1 f2 l2 f3 l3
+  meta "remove_unused:dependency" axiom slice_has_bounds, function slice
+end
+
+module Array__4
+  use bool.Bool
+
+  clone Array__Index as I1
+  clone Array__Index as I2
+  clone Array__Index as I3
+  clone Array__Index as I4
+
+  type component_type
+
+  type map
+  type map__ref = { mutable map__content [@model_trace:] : map }
+  val map__havoc (x : map__ref) : unit
+     writes { x }
+
+  predicate has_bounds map I1.t I1.t I2.t I2.t I3.t I3.t I4.t I4.t
+
+  val function get map I1.t I2.t I3.t I4.t : component_type
+
+  predicate eq_ext map map I1.t I1.t I2.t I2.t I3.t I3.t I4.t I4.t
+
+  axiom eq_ext_def :
+    forall a1 a2 : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t, f4 l4 : I4.t
+      [eq_ext a1 a2 f1 l1 f2 l2 f3 l3 f4 l4].
+      eq_ext a1 a2 f1 l1 f2 l2 f3 l3 f4 l4 <-> a1 = a2
+  meta "remove_unused:dependency" axiom eq_ext_def, predicate eq_ext
+
+  axiom extensionality :
+    forall a1 a2 : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t, f4 l4 : I4.t
+      [eq_ext a1 a2 f1 l1 f2 l2 f3 l3 f4 l4].
+      a1 <> a2 ->
+      has_bounds a1 f1 l1 f2 l2 f3 l3 f4 l4 ->
+      has_bounds a2 f1 l1 f2 l2 f3 l3 f4 l4 ->
+      exists i1 : I1.t, i2 : I2.t, i3 : I3.t, i4 : I4.t.
+        I1.le f1 i1 /\ I1.le i1 l1 /\
+        I2.le f2 i2 /\ I2.le i2 l2 /\
+        I3.le f3 i3 /\ I3.le i3 l3 /\
+        I4.le f4 i4 /\ I4.le i4 l4 /\ get a1 i1 i2 i3 i4 <> get a2 i1 i2 i3 i4
+  meta "remove_unused:dependency" axiom extensionality, predicate eq_ext
+
+  (* Writing into an array *)
+
+  val function set map I1.t I2.t I3.t I4.t component_type : map
+  axiom set_def :
+    forall a : map, i1 : I1.t, i2 : I2.t, i3 : I3.t, i4 : I4.t, v : component_type
+      [set a i1 i2 i3 i4 v].
+      (* value at index i1 i2 i3 i4 *)
+      get (set a i1 i2 i3 i4 v) i1 i2 i3 i4 = v
+    /\
+      (* value at index j1, j2, j3, j4 /= i1, i2, i3, i4 *)
+      (forall j1 : I1.t, j2 : I2.t, j3 : I3.t, j4 : I4.t
+         [get a j1 j2 j3 j4 | get (set a i1 i2 i3 i4 v) j1 j2 j3 j4].
+         (i1 <> j1 \/ i2 <> j2 \/ i3 <> j3 \/ i4 <> j4) ->
+	 get (set a i1 i2 i3 i4 v) j1 j2 j3 j4 = get a j1 j2 j3 j4)
+    /\
+      (* bounds *)
+      (forall f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t, f4 l4 : I4.t
+         [has_bounds (set a i1 i2 i3 i4 v) f1 l1 f2 l2 f3 l3 f4 l4].
+         I1.le f1 i1 /\ I1.le i1 l1 ->
+         I2.le f2 i2 /\ I2.le i2 l2 ->
+         I3.le f3 i3 /\ I3.le i3 l3 ->
+         I4.le f4 i4 /\ I4.le i4 l4 ->
+         has_bounds a f1 l1 f2 l2 f3 l3 f4 l4 ->
+	 has_bounds (set a i1 i2 i3 i4 v) f1 l1 f2 l2 f3 l3 f4 l4)
+  meta "remove_unused:dependency" axiom set_def, function set
+
+  (* Sliding an array from old_first to new_first *)
+
+  val function slide map I1.t I1.t I2.t I2.t I3.t I3.t I4.t I4.t : map
+
+  (* Special case of an array not slided *)
+  axiom slide_eq :
+    forall a : map, first_1 : I1.t, first_2 : I2.t, first_3 : I3.t, first_4 : I4.t
+      [slide a first_1 first_1 first_2 first_2 first_3 first_3 first_4 first_4].
+      slide a first_1 first_1 first_2 first_2 first_3 first_3 first_4 first_4 = a
+  meta "remove_unused:dependency" axiom slide_eq, function slide
+
+  axiom slide_def :
+    forall a : map,
+           old_first_1 new_first_1 : I1.t,
+	   old_first_2 new_first_2 : I2.t,
+	   old_first_3 new_first_3 : I3.t,
+	   old_first_4 new_first_4 : I4.t
+      [slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3 old_first_4 new_first_4].
+      (* slided values *)
+      (forall i1 : I1.t, i2 : I2.t, i3 : I3.t, i4 : I4.t
+         [get (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3 old_first_4 new_first_4) i1 i2 i3 i4].
+         get (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3 old_first_4 new_first_4) i1 i2 i3 i4 =
+	 get a (I1.sub i1 (I1.sub new_first_1 old_first_1)) (I2.sub i2 (I2.sub old_first_2 new_first_2)) (I3.sub i3 (I3.sub old_first_3 new_first_3)) (I4.sub i4 (I4.sub old_first_4 new_first_4)))
+    /\
+      (* bounds *)
+      (forall new_last_1 : I1.t, new_last_2 : I2.t, new_last_3 : I3.t, new_last_4 : I4.t
+         [has_bounds (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3 old_first_4 new_first_4) new_first_1 new_last_1 new_first_2 new_last_2 new_first_3 new_last_3 new_last_4].
+         has_bounds a
+	   old_first_1 (I1.sub new_last_1 (I1.sub new_first_1 old_first_1))
+	   old_first_2 (I2.sub new_last_2 (I2.sub new_first_2 old_first_2))
+	   old_first_3 (I3.sub new_last_3 (I3.sub new_first_3 old_first_3))
+	   old_first_4 (I4.sub new_last_4 (I4.sub new_first_4 old_first_4)) ->
+         has_bounds (slide a old_first_1 new_first_1 old_first_2 new_first_2 old_first_3 new_first_3 old_first_4 new_first_4) new_first_1 new_last_1 new_first_2 new_last_2 new_first_3 new_last_3 new_first_4 new_last_4)
+  meta "remove_unused:dependency" axiom slide_def, function slide
+
+  (* An array containing the value v at all indexes. It is used for the value
+     of aggregate associations with a box. *)
+
+   function const component_type I1.t I1.t I2.t I2.t I3.t I3.t I4.t I4.t : map
+
+   axiom const_def :
+    forall v : component_type,
+           first_1 last_1 : I1.t,
+	   first_2 last_2 : I2.t,
+	   first_3 last_3 : I3.t,
+	   first_4 last_4 : I4.t
+      [const v first_1 last_1 first_2 last_2 first_3 last_3 first_4 last_4].
+      (* values *)
+      (forall i1 : I1.t, i2 : I2.t, i3 : I3.t, i4 : I4.t
+         [get (const v first_1 last_1 first_2 last_2 first_3 last_3 first_4 last_4) i1 i2 i3 i4].
+         (I1.le first_1 i1 /\ I1.le i1 last_1) ->
+         (I2.le first_2 i2 /\ I2.le i2 last_2) ->
+         (I3.le first_3 i3 /\ I3.le i3 last_3) ->
+         (I4.le first_4 i4 /\ I4.le i4 last_4) ->
+	 get (const v first_1 last_1 first_2 last_2 first_3 last_3 first_4 last_4) i1 i2 i3 i4 = v)
+    /\
+      (* bounds *)
+      has_bounds (const v first_1 last_1 first_2 last_2 first_3 last_3 first_4 last_4) first_1 last_1 first_2 last_2 first_3 last_3 first_4 last_4
+   meta "remove_unused:dependency" axiom const_def, function const
+
+  (* A slice of a array *)
+
+  val function slice map I1.t I1.t I2.t I2.t I3.t I3.t I4.t I4.t : map
+
+  (* Special case of an array not sliced *)
+  axiom slice_eq :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t, f4 l4 : I4.t
+      [slice a f1 l1 f2 l2 f3 l3 f4 l4, has_bounds a f1 l1 f2 l2 f3 l3 f4 l4].
+      has_bounds a f1 l1 f2 l2 f3 l3 f4 l4 -> slice a f1 l1 f2 l2 f3 l3 f4 l4 = a
+  meta "remove_unused:dependency" axiom slice_eq, function slice
+
+  axiom slice_def :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t, f4 l4 : I4.t
+      [slice a f1 l1 f2 l2 f3 l3 f4 l4].
+      (* values *)
+      forall i1 : I1.t, i2 : I2.t, i3 : I3.t, i4 : I4.t
+        [get (slice a f1 l1 f2 l2 f3 l3 f4 l4) i1 i2 i3 i4 | get a i1 i2 i3 i4].
+        (I1.le f1 i1 /\ I1.le i1 l1) ->
+        (I2.le f2 i2 /\ I2.le i2 l2) ->
+        (I3.le f3 i3 /\ I3.le i3 l3) ->
+        (I4.le f4 i4 /\ I4.le i4 l4) ->
+	get (slice a f1 l1 f2 l2 f3 l3 f4 l4) i1 i2 i3 i4 = get a i1 i2 i3 i4
+  meta "remove_unused:dependency" axiom slice_def, function slice
+
+  axiom slice_has_bounds :
+    forall a : map, f1 l1 : I1.t, f2 l2 : I2.t, f3 l3 : I3.t, f4 l4 : I4.t
+      [has_bounds (slice a f1 l1 f2 l2 f3 l3 f4 l4) f1 l1 f2 l2 f3 l3 f4 l4].
+      (* bounds *)
+      has_bounds (slice a f1 l1 f2 l2 f3 l3 f4 l4) f1 l1 f2 l2 f3 l3 f4 l4
+  meta "remove_unused:dependency" axiom slice_has_bounds, function slice
+end
+
+module BVAda
+  type t
+
+  let function abs (x : t) : t = x
+
+  predicate ult t t
+  predicate ule t t
+  predicate ugt t t
+  predicate uge t t
+
+  function to_uint t : int
+
+  use bool.Bool
+  function bool_eq (x: t) (y: t) : bool = x = y
+  function bool_ne (x: t) (y: t) : bool = x <> y
+  function bool_lt (x: t) (y: t) : bool = ult x y
+  function bool_le (x: t) (y: t) : bool = ule x y
+  function bool_gt (x: t) (y: t) : bool = ugt x y
+  function bool_ge (x: t) (y: t) : bool = uge x y
+
+  val bool_eq (x y : t) : bool
+  ensures { result = bool_eq x y }
+  val bool_ne (x y : t) : bool
+  ensures { result = bool_ne x y }
+  val bool_lt (x y : t) : bool
+  ensures { result = bool_lt x y }
+  val bool_le (x y : t) : bool
+  ensures { result = bool_le x y }
+  val bool_gt (x y : t) : bool
+  ensures { result = bool_gt x y }
+  val bool_ge (x y : t) : bool
+  ensures { result = bool_ge x y }
+
+  val neq (v1: t) (v2: t) : bool
+    ensures { result <-> v1 <> v2 }
+
+  use int.Int
+  function one : t
+
+  function (*) t t : t
+
+  val function power t int : t
+
+  axiom Power_0 : forall x: t. power x 0 = one
+  meta "remove_unused:dependency" axiom Power_0, function power
+
+  lemma Power_1 : forall x : t. power x 1 = x
+  meta "remove_unused:dependency" lemma Power_1, function power
+
+  axiom Power_s : forall x: t, n: int. n >= 0 -> power x (n+1) = x * power x n
+  meta "remove_unused:dependency" axiom Power_s, function power
+
+  lemma Power_s_alt: forall x: t, n: int. n > 0 -> power x n = x * power x (n-1)
+  meta "remove_unused:dependency" lemma Power_s_alt, function power
+
+  lemma Power_sum : forall x: t, n m: int. 0 <= n -> 0 <= m ->
+    power x (n+m) = power x n * power x m
+  meta "remove_unused:dependency" lemma Power_sum, function power
+
+  lemma Power_mult : forall x:t, n m : int. 0 <= n -> 0 <= m ->
+    power x (Int.(*) n m) = power (power x n) m
+  meta "remove_unused:dependency" lemma Power_mult, function power
+
+  lemma Power_mult2 : forall x y: t, n: int. 0 <= n ->
+    power (x * y) n = power x n * power y n
+  meta "remove_unused:dependency" lemma Power_mult2, function power
+
+  function bv_min (x y : t) : t = if ule x y then x else y
+  function bv_max (x y : t) : t = if ule x y then y else x
+
+  val bv_min (x y : t) : t
+  ensures { result = if ule x y then x else y }
+  val bv_max (x y : t) : t
+  ensures { result = if ule x y then y else x }
+
+  use int.MinMax as MinMax
+
+  lemma bv_min_to_uint: forall x y.
+    to_uint (bv_min x y) = MinMax.min (to_uint x) (to_uint y)
+  meta "remove_unused:dependency" lemma bv_min_to_uint, function bv_min
+
+  lemma bv_max_to_uint: forall x y.
+    to_uint (bv_max x y) = MinMax.max (to_uint x) (to_uint y)
+  meta "remove_unused:dependency" lemma bv_max_to_uint, function bv_max
+
+  (** Unchecked_Conversion from/to integers
+      This is used to translate NeXTCode Unchecked_Conversion between
+      signed and modular integers of the same bit size.
+  *)
+
+  function of_int int : t
+  function neg t : t
+  constant two_power_size_minus_one : int
+
+  function uc_of_int (x : int) : t =
+    if x >= 0 then (of_int x) else (neg (of_int (- x)))
+  val uc_of_int (x : int) : t ensures { result = uc_of_int x }
+
+  function uc_to_int (x : t) : int =
+    if bool_lt x (of_int two_power_size_minus_one) then (to_uint x)
+    else (- (to_uint (neg x)))
+  val uc_to_int (x : t) : int ensures { result = uc_to_int x }
+
+end
+
+module BV8
+  use export bv.BV8
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+
+  clone export BVAda with
+    type t = t,
+    predicate ult = ult,
+    predicate ule = ule,
+    predicate ugt = ugt,
+    predicate uge = uge,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function ( * ) = mul,
+    function neg = neg,
+    function one = one,
+    function two_power_size_minus_one = two_power_size_minus_one
+
+  val of_int_ (i : int) : t
+    requires{ uint_in_range i }
+    ensures{ result = of_int i }
+
+  val udiv_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = udiv x y }
+
+  val urem_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = urem x y }
+
+  val constant _two_power_size : int
+    ensures{ result = two_power_size }
+
+  function t_int [@rewrite:t_int] (x : t) : int = t'int x
+
+  val t_int (x : t) : int
+    ensures { result = t'int x }
+end
+
+module BV16
+  use export bv.BV16
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+
+  clone export BVAda with
+    type t = t,
+    predicate ult = ult,
+    predicate ule = ule,
+    predicate ugt = ugt,
+    predicate uge = uge,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function ( * ) = mul,
+    function neg = neg,
+    function one = one,
+    function two_power_size_minus_one = two_power_size_minus_one
+
+  val of_int_ (i : int) : t
+    requires{ uint_in_range i }
+    ensures{ result = of_int i }
+
+  val udiv_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = udiv x y }
+
+  val urem_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = urem x y }
+
+  val constant _two_power_size : int
+    ensures{ result = two_power_size }
+
+  function t_int [@rewrite:t_int] (x : t) : int = t'int x
+
+  val t_int (x : t) : int
+    ensures { result = t'int x }
+end
+
+module BV32
+  use export bv.BV32
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+
+  clone export BVAda with
+    type t = t,
+    predicate ult = ult,
+    predicate ule = ule,
+    predicate ugt = ugt,
+    predicate uge = uge,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function ( * ) = mul,
+    function neg = neg,
+    function one = one,
+    function two_power_size_minus_one = two_power_size_minus_one
+
+  val of_int_ (i : int) : t
+    requires{ uint_in_range i }
+    ensures{ result = of_int i }
+
+  val udiv_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = udiv x y }
+
+  val urem_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = urem x y }
+
+  val constant _two_power_size : int
+    ensures{ result = two_power_size }
+
+  function t_int [@rewrite:t_int] (x : t) : int = t'int x
+
+  val t_int (x : t) : int
+    ensures { result = t'int x }
+end
+
+module BV64
+  use export bv.BV64
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+
+  clone export BVAda with
+    type t = t,
+    predicate ult = ult,
+    predicate ule = ule,
+    predicate ugt = ugt,
+    predicate uge = uge,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function ( * ) = mul,
+    function neg = neg,
+    function one = one,
+    function two_power_size_minus_one = two_power_size_minus_one
+
+  val of_int_ (i : int) : t
+    requires{ uint_in_range i }
+    ensures{ result = of_int i }
+
+  val udiv_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = udiv x y }
+
+  val urem_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = urem x y }
+
+  val constant _two_power_size : int
+    ensures{ result = two_power_size }
+
+  function t_int [@rewrite:t_int] (x : t) : int = t'int x
+
+  val t_int (x : t) : int
+    ensures { result = t'int x }
+end
+
+module BV128
+  use export bv.BV128
+
+  type t__ref = { mutable t__content [@model_trace:] : t }
+  val t__havoc (x : t__ref) : unit
+     writes { x }
+
+  clone export BVAda with
+    type t = t,
+    predicate ult = ult,
+    predicate ule = ule,
+    predicate ugt = ugt,
+    predicate uge = uge,
+    function to_uint = t'int,
+    function of_int = of_int,
+    function ( * ) = mul,
+    function neg = neg,
+    function one = one,
+    function two_power_size_minus_one = two_power_size_minus_one
+
+  val of_int_ (i : int) : t
+    requires{ uint_in_range i }
+    ensures{ result = of_int i }
+
+  val udiv_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = udiv x y }
+
+  val urem_ (x : t) (y : t) : t
+    requires{ y <> zeros }
+    ensures{ result = urem x y }
+
+  val constant _two_power_size : int
+    ensures{ result = two_power_size }
+
+  function t_int [@rewrite:t_int] (x : t) : int = t'int x
+
+  val t_int (x : t) : int
+    ensures { result = t'int x }
+end
+
+(* For conversion to bv 256 bits, only need version from 128 bits, as part
+   of checking of overflows on some 128 bits modular operations. There are no
+   user-defined conversions to bv 256 bits otherwise.
+ *)
+module BVConv_128_256
+  use export bv.BVConverter_128_256
+
+  val range_check_ (f l x : BV256.t) : BV256.t
+    requires { (BV256.ule f x) /\ (BV256.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_64_128
+  use export bv.BVConverter_64_128
+
+  val range_check_ (f l x : BV128.t) : BV128.t
+    requires { (BV128.ule f x) /\ (BV128.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_32_128
+  use export bv.BVConverter_32_128
+
+  val range_check_ (f l x : BV128.t) : BV128.t
+    requires { (BV128.ule f x) /\ (BV128.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_16_128
+  use export bv.BVConverter_16_128
+
+  val range_check_ (f l x : BV128.t) : BV128.t
+    requires { (BV128.ule f x) /\ (BV128.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_8_128
+  use export bv.BVConverter_8_128
+
+  val range_check_ (f l x : BV128.t) : BV128.t
+    requires { (BV128.ule f x) /\ (BV128.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_32_64
+  use export bv.BVConverter_32_64
+
+  val range_check_ (f l x : BV64.t) : BV64.t
+    requires { (BV64.ule f x) /\ (BV64.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_16_64
+  use export bv.BVConverter_16_64
+
+  val range_check_ (f l x : BV64.t) : BV64.t
+    requires { (BV64.ule f x) /\ (BV64.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_8_64
+  use export bv.BVConverter_8_64
+
+  val range_check_ (f l x : BV64.t) : BV64.t
+    requires { (BV64.ule f x) /\ (BV64.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_16_32
+  use export bv.BVConverter_16_32
+
+  val range_check_ (f l x : BV32.t) : BV32.t
+    requires { (BV32.ule f x) /\ (BV32.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_8_32
+  use export bv.BVConverter_8_32
+
+  val range_check_ (f l x : BV32.t) : BV32.t
+    requires { (BV32.ule f x) /\ (BV32.ule x l) }
+    ensures { result = x }
+end
+
+module BVConv_8_16
+  use export bv.BVConverter_8_16
+
+  val range_check_ (f l x : BV16.t) : BV16.t
+    requires { (BV16.ule f x) /\ (BV16.ule x l) }
+    ensures { result = x }
+end
+
+(* Module for the representative type of all access-to-subprogram types *)
+
+module Subprogram_Pointer_Rep
+  type __subprogram
+
+  val constant __dummy_subprogram : __subprogram
+
+  type __rep =
+    { __is_null_pointer : bool;
+      __pointer_value   : __subprogram }
+
+  type __rep__ref = {
+    mutable __rep__content : __rep
+  }
+
+  val __rep__havoc (x: __rep__ref) : unit writes { x }
+
+  function bool_eq (a: __rep) (b: __rep) : bool =
+    a.__is_null_pointer = b.__is_null_pointer &&
+     (if not a.__is_null_pointer
+      then a.__pointer_value = b.__pointer_value
+      else true)
+
+  val bool_eq (a: __rep) (b: __rep) : bool
+    ensures { result = bool_eq a b }
+
+  val function __null_pointer : __rep
+
+  axiom __null_pointer__def_axiom:
+    __null_pointer.__is_null_pointer
+  meta "remove_unused:dependency" axiom __null_pointer__def_axiom, function __null_pointer
+
+
+  val __pointer_value_ (a: __rep) : __subprogram
+    requires { not a.__is_null_pointer }
+    ensures { result = a.__pointer_value }
+
+  val assign_null_check_ (a: __rep) : __rep
+    requires { not a.__is_null_pointer }
+    ensures { result = a }
+
+end

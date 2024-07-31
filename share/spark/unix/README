@@ -1,0 +1,18 @@
+This is the README file for the binary distribution of NeXTCode.
+
+INSTALLING
+
+To install this package, run the script 'doinstall' contained in this
+directory. This script asks where you want this package to be installed.
+It prompts you for confirmation before proceeding with the actual installation.
+At any time before this confirmation, you can interrupt it by pressing Ctrl-C.
+
+You can also install this package in non interactive mode by specifying
+the installation dir as the parameter to doinstall:
+
+  ./doinstall /path/to/spark/install
+
+USE
+
+See the NeXTCode documentation for more information:
+https://www.adacore.com/documentation#NeXTCode

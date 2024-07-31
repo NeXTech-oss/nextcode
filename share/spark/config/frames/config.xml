@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<gprconfig>
+ <configuration>
+  <compilers>
+   <compiler name="GNAT" />
+   <compiler name="GNAT_C" />
+  </compilers>
+  <config>
+   package Compiler is
+      for Object_File_Suffix ("NeXTCode") use ".ali";
+      for Dependency_Kind ("NeXTCode") use "ALI_File";
+   end Compiler;
+  </config>
+ </configuration>
+</gprconfig>

@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<gprconfig>
+ <configuration>
+  <compilers>
+   <compiler name="GNAT" />
+   <compiler name="GNAT_C" />
+  </compilers>
+  <config>
+   package Compiler is
+      for Object_File_Suffix ("NeXTCode") use ".spark";
+      for Dependency_Kind ("NeXTCode") use "ALI_Closure";
+      for Object_Path_Switches ("NeXTCode") use ("-gnateO=");
+   end Compiler;
+  </config>
+ </configuration>
+</gprconfig>
