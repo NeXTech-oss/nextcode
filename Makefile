@@ -56,6 +56,8 @@ CONFIGDIR=$(GNATPROVEDIR)/config
 EXPLAINCODESDIR=$(GNATPROVEDIR)/explain_codes
 THEORIESDIR=$(GNATPROVEDIR)/theories
 RUNTIMESDIR=$(GNATPROVEDIR)/runtimes
+RUNTIMEDIR=$(RUNTIMEDIR)/runtime
+
 DOC=ug lrm
 # Control if gnatprove is built in production or debug mode
 PROD=-XBuild=Production
