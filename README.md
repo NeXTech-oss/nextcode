@@ -5,21 +5,27 @@ NeXTCode is an innovative programming language that combines the efficiency and 
 procedure Main is
    type Circle is record
       Radius : Float;
-   end record;
+   end record with
+      Predicate => Radius >= 0.0;
 
    Pi : constant Float := 3.14;
 
-   function Area(C : Circle) return Float is
+   function Area(C : Circle) return Float with
+      Pre => C.Radius >= 0.0,
+      Post => Area'Result >= 0.0 is
    begin
       return Pi * C.Radius ** 2;
    end Area;
 
-   procedure Print_Total_Area(Circles : array of Circle) is
+   procedure Print_Total_Area(Circles : array of Circle) with
+      Pre => Circles'Length > 0,
+      Post => True is
       Total_Area : Float := 0.0;
    begin
       for C of Circles loop
          Total_Area := Total_Area + Area(C);
       end loop;
+      -- Assuming Output is a procedure to print the result
       Output("Total area: " & Float'Image(Total_Area));
    end Print_Total_Area;
 
